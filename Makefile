@@ -26,11 +26,13 @@ COMMON_RUN_OPTS = -ti -u ros -w /home/ros/workspace -e HOME=/home/ros \
 # Command used to launch a login shell into the image
 LOGIN_RUN_OPTS = $(COMMON_RUN_OPTS) /bin/bash -l
 
-# Command used to launch a login shell into the image
+BUILD_RUN_OPTS = $(COMMON_RUN_OPTS) /bin/bash -c \
+		'source ~/workspace/devel/setup.bash; catkin_make'
+
 TEST_RUN_OPTS = $(COMMON_RUN_OPTS) /bin/bash -c \
 		'source ~/workspace/devel/setup.bash; catkin_make run_tests'
 
-all: image
+all: build
 
 # Build a Docker image for this repo
 image:
@@ -39,6 +41,10 @@ image:
 # Run the test suite
 test: image
 	$(DOCKER) run --rm $(TEST_RUN_OPTS)
+
+# Run the test suite
+build: image
+	$(DOCKER) run --rm $(BUILD_RUN_OPTS)
 
 # Launch a shell in the Docker image *after* building
 login: image
