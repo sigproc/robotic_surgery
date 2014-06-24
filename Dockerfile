@@ -7,6 +7,7 @@ USER root
 
 # Install additional packages
 RUN apt-get -y install ros-hydro-moveit-full
+RUN apt-get -y install ros-hydro-dynamixel-motor ros-hydro-dynamixel-controllers
 
 # Add this repository to the ros user's workspace.
 ADD . /home/ros/workspace/src/robotic_surgery
