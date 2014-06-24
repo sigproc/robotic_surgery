@@ -1,0 +1,14 @@
+<package>
+  <name>surgery_launch</name>
+  <version>0.1.0</version>
+  <description>
+    roslaunch files for the CUED robotic surgery Masters' projects.
+  </description>
+  <author>Rich Wareham</author>
+  <maintainer email="rjw57@cam.ac.uk">Rich Wareham</maintainer>
+  <license>MIT</license>
+
+  <url type="repository">https://github.com/sigproc/robotic_surgery</url>
+
+  <buildtool_depend>catkin</buildtool_depend>
+</package>

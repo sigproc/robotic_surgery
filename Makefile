@@ -17,24 +17,24 @@ TAG ?= $(shell git name-rev HEAD --name-only 2>/dev/null || echo "latest")
 DEV_IMAGE_NAME = $(WHOAMI)/robotic-surgery:$(TAG)
 
 # Command used to launch a login shell into the image
-LOGIN_CMD = "$(DOCKER)" run --rm -ti -u ros -w /home/ros -e HOME=/home/ros \
-	"$(DEV_IMAGE_NAME)" /bin/bash -l
+LOGIN_RUN_OPTS = -ti -u ros -w /home/ros/workspace -e HOME=/home/ros \
+		 "$(DEV_IMAGE_NAME)" /bin/bash -l
 
-all: build
+all: image
 
 # Build a Docker image for this repo
-build:
+image:
 	"$(DOCKER)" build -t "$(DEV_IMAGE_NAME)" .
 
 # Launch a shell in the Docker image *after* building
-login: build
-	$(LOGIN_CMD)
+login: image
+	$(DOCKER) run --rm $(LOGIN_RUN_OPTS)
 
 # Launch a shell in the Docker image *without* building. Usually you don't want
 # to do this.
 no-build-login:
-	$(LOGIN_CMD)
+	$(DOCKER) run --rm $(LOGIN_RUN_OPTS)
 
-.PHONY: all build login
+.PHONY: all build login image no-build-login
 
 .DEFAULT: all
