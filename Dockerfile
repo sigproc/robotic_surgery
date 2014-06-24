@@ -8,5 +8,6 @@ ADD . /home/ros/workspace/src/robotic_surgery
 RUN chown -R ros:ros /home/ros/workspace/src/robotic_surgery
 
 # Build the repository
+USER ros
 WORKDIR /home/ros/workspace/
 RUN HOME=/home/ros /bin/bash -c 'source ~/workspace/devel/setup.bash; catkin_make'
