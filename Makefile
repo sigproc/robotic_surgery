@@ -16,9 +16,15 @@ TAG ?= $(shell git name-rev HEAD --name-only 2>/dev/null || echo "latest")
 # Name of image to build
 DEV_IMAGE_NAME = $(WHOAMI)/robotic-surgery:$(TAG)
 
+# These options perform some basic magic to allow X11 programs to
+# tunnel through to the host.
+COMMON_RUN_OPTS = -ti -u ros -w /home/ros/workspace -e HOME=/home/ros \
+		  -e QT_X11_NO_MITSHM=1 -e DISPLAY=${DISPLAY} \
+		  -v /tmp/.X11-unix:/tmp/.X11-unix \
+		  "$(DEV_IMAGE_NAME)"
+
 # Command used to launch a login shell into the image
-LOGIN_RUN_OPTS = -ti -u ros -w /home/ros/workspace -e HOME=/home/ros \
-		 "$(DEV_IMAGE_NAME)" /bin/bash -l
+LOGIN_RUN_OPTS = $(COMMON_RUN_OPTS) /bin/bash -l
 
 all: image
 
