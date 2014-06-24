@@ -1,4 +1,4 @@
-FROM sigproc/robotic-surgery:ros-hydro
+FROM sigproc/ros:hydro
 
 MAINTAINER Rich Wareham <rjw57@cam.ac.uk>
 
