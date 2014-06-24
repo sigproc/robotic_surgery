@@ -12,11 +12,6 @@ MAINTAINER Rich Wareham <rjw57@cam.ac.uk>
 # Use the "noninteractive" debconf frontend since we're installing in a non-interactive way.
 ENV DEBIAN_FRONTEND noninteractive
 
-# Make sure that all package sources are up-to-date and that we have the latest
-# versions of system packages.
-RUN apt-get -y update
-RUN apt-get -y upgrade
-
 # Install package containing the CLI tools we'll be using. N.B. after "precise"
 # the add-apt-repository command moved to software-properties-common.
 RUN apt-get -y install apt-utils
@@ -41,18 +36,14 @@ RUN apt-get -y install python-rosinstall
 # Initialise rosdep
 RUN rosdep init
 
-# Create ros user as a user with serial port permissions
+# Now create the ros user itself
 RUN adduser --gecos "ROS User" --disabled-password ros
 RUN usermod -a -G dialout ros
 
-# As ros:
+# And, as that user...
 USER ros
 
 # HOME needs to be set explicitly. Without it, the HOME environment variable is
 # set to "/"
 RUN echo "source /opt/ros/hydro/setup.bash" >> /home/ros/.bashrc
 RUN HOME=/home/ros rosdep update
-
-# The default command is to launch a login shell as ros
-WORKDIR /home/ros
-CMD HOME=/home/ros /bin/bash -l
