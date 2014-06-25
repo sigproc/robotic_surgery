@@ -1,27 +1,45 @@
+.PHONY: default help build shell root_shell gui _gui
+
+.DEFAULT: default
+
 ### CUSTOMISABLE VARIABLES
+#
+# These variables have default values which may be overridden on the command line.
 
 # Username used to prefix Docker images with.
 WHOAMI ?= ${USER}
 
-# Location of Docker binary
+# Docker binary
 DOCKER ?= docker
 
 # What is a suitable name for the current git branch? Use it as the Docker tag.
 # If this is not a git repo, or there is no HEAD ref, use "latest" as a
 # fallback.
-TAG ?= $(shell git name-rev HEAD --name-only 2>/dev/null || echo "latest")
+TAG ?= $(shell git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "latest")
+
+# The name of this project
+PROJECT ?= robotic_surgery
+
+# The size of the GUI screen
+GUI_SCREEN ?= 1440x960
+
+# The VNC viewer command. Should accept a host:display style option
+VNC_VIEWER ?= vncviewer
+
+# Arguments to pass to roslaunch
+LAUNCH ?=
 
 ### DERIVED VARIABLES
+#
+# Variables which are not intended to be overridden on the command line.
 
-# Name of image to build
-DEV_IMAGE_NAME = $(WHOAMI)/robotic-surgery:$(TAG)
+# Name of image to build.
+PROJECT_IMAGE := $(WHOAMI)/$(PROJECT):$(TAG)
 
-# These options perform some basic magic to allow X11 programs to
-# tunnel through to the host.
-COMMON_RUN_OPTS = -ti -u ros -w /home/ros/workspace -e HOME=/home/ros \
-		  -e QT_X11_NO_MITSHM=1 -e DISPLAY=${DISPLAY} \
-		  -v /tmp/.X11-unix:/tmp/.X11-unix \
-		  "$(DEV_IMAGE_NAME)"
+# Run a command in the image as ros or root.
+DOCKER_RUN_COMMON := $(DOCKER) run -it --privileged
+DOCKER_RUN_ROS := -u ros -w /home/ros/workspace -e HOME=/home/ros "$(PROJECT_IMAGE)"
+DOCKER_RUN_ROOT := -u root "$(PROJECT_IMAGE)"
 
 # Command used to launch a login shell into the image
 LOGIN_RUN_OPTS = $(COMMON_RUN_OPTS) /bin/bash -l
@@ -32,29 +50,29 @@ BUILD_RUN_OPTS = $(COMMON_RUN_OPTS) /bin/bash -c \
 TEST_RUN_OPTS = $(COMMON_RUN_OPTS) /bin/bash -c \
 		'source ~/workspace/devel/setup.bash; catkin_make run_tests'
 
-all: build
+default: build
 
-# Build a Docker image for this repo
-image:
-	"$(DOCKER)" build -t "$(DEV_IMAGE_NAME)" .
+# Build Docker image from our top-level Dockerfile
+build:
+	$(DOCKER) build -t $(PROJECT_IMAGE) .
 
-# Run the test suite
-test: image
-	$(DOCKER) run --rm $(TEST_RUN_OPTS)
+# Launch a login shell in the image.
+shell: build
+	$(DOCKER_RUN_COMMON) -P --rm $(DOCKER_RUN_ROS) bash -l
 
-# Run the test suite
-build: image
-	$(DOCKER) run --rm $(BUILD_RUN_OPTS)
+# Launch a login shell in the image as the root user.
+root_shell: build
+	$(DOCKER_RUN_COMMON) -P --rm $(DOCKER_RUN_ROOT) bash -l
 
-# Launch a shell in the Docker image *after* building
-login: image
-	$(DOCKER) run --rm $(LOGIN_RUN_OPTS)
-
-# Launch a shell in the Docker image *without* building. Usually you don't want
-# to do this.
-no-build-login:
-	$(DOCKER) run --rm $(LOGIN_RUN_OPTS)
-
-.PHONY: all build login image no-build-login
-
-.DEFAULT: all
+# Launch a GUI session.
+gui: build
+	gui_cid=`$(DOCKER_RUN_COMMON) -p 5900 -d $(DOCKER_RUN_ROS) \
+		src/robotic_surgery/scripts/launch_gui.sh $(GUI_SCREEN) lxterminal` ; \
+	echo "Spawned GUI container $$gui_cid" ; \
+	gui_ip=`$(DOCKER) inspect -f '{{ .NetworkSettings.IPAddress }}' $$gui_cid` ; \
+	echo "IP address is $$gui_ip" ; \
+	scripts/wait_port.sh $$gui_ip 5900; $(VNC_VIEWER) $$gui_ip:0 ; \
+	$(DOCKER) logs $$gui_cid ; \
+	echo "Killing $$gui_cid..." ; \
+	$(DOCKER) kill $$gui_cid ; \
+	$(DOCKER) rm $$gui_cid ;
