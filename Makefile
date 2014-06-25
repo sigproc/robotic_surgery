@@ -56,6 +56,10 @@ default: build
 build:
 	$(DOCKER) build -t $(PROJECT_IMAGE) .
 
+ssh: build
+	ssh_cid=`$(DOCKER_RUN_COMMON) -d -p 22 $(DOCKER_RUN_ROOT) /usr/sbin/sshd -D` ; \
+	echo "SSH server launched on `$(DOCKER) inspect -f '{{ .NetworkSettings.IPAddress }}' $$ssh_cid`"
+
 # Launch a login shell in the image.
 shell: build
 	$(DOCKER_RUN_COMMON) -P --rm $(DOCKER_RUN_ROS) bash -l

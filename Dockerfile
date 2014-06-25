@@ -15,6 +15,14 @@ RUN apt-get -y install gazebo ros-hydro-gazebo-ros
 RUN apt-get -y install x11vnc xvfb
 RUN apt-get -y install lubuntu-core
 RUN apt-get -y install lxterminal
+RUN apt-get -y install openssh-server
+
+# Set password for ros and add to sudoers
+RUN echo 'ros:ros' | chpasswd
+RUN usermod -a -G sudo ros
+
+# Add ssh's required directory
+RUN mkdir /var/run/sshd
 
 # Add this repository to the ros user's workspace.
 ADD . /home/ros/workspace/src/robotic_surgery
