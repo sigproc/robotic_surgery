@@ -32,14 +32,15 @@ RUN apt-get -y install ros-hydro-moveit-full \
     lubuntu-core lxterminal openssh-server xserver-xephyr \
     openrave0.8-dp-plugin-oderave openrave0.8-dp-plugin-textserver
 
+# Comment out annoying line which stops .bashrc from sourcing for
+# non-interactive shells.
+RUN sed -i 's/\[ -z "$PS1" \] && return/# &/' /home/ros/.bashrc
+
 # Copy ssh config
 ADD ./config/ssh /home/ros/.ssh
 RUN chown -R ros:ros /home/ros/.ssh
 RUN chmod -R og-rwx /home/ros/.ssh
 
-# Add this repository to the ros user's workspace.
-ADD . /home/ros/workspace/src/robotic_surgery
+# Copy ROS source code to ROS workspace
+ADD ./ros /home/ros/workspace/src/robotic_surgery
 RUN chown -R ros:ros /home/ros/workspace/src/robotic_surgery
-
-# Comment out annoying line which stops .bashrc from sourcing for
-# non-interactive shells.

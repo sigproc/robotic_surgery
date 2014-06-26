@@ -24,6 +24,14 @@ GUI_SCREEN ?= 1440x960
 # Override to run a specific command in the container via make shell
 CMD ?=
 
+# Override to pass additional arguments to catkin_make via make build
+CM_ARGS ?=
+
+# ROS package and launch file and additional parameters to use with roslaunch (make launch)
+PKG ?= surgery_launch
+LAUNCH ?= surgery.launch
+PARAMS ?=
+
 ### DERIVED VARIABLES
 #
 # Variables which are not intended to be overridden on the command line.
@@ -57,7 +65,7 @@ SSH := ssh -o StrictHostKeyChecking=no -i config/ros_user_ssh_key -l ros
 REMOVE_SSH_TARGET := delete_all_my_work
 
 .PHONY: default
-default: image
+default: build
 
 .PHONY: image
 image:
@@ -95,14 +103,16 @@ ssh: _ssh_container_valid
 	@echo "SSH started. Log in with\n"
 	@echo "    $(SSH) $(SSH_IP)"
 
-$(REMOVE_SSH_TARGET): _existing_ssh_container
-	$(DOCKER) stop $(SSH_NAME)
-	$(DOCKER) rm $(SSH_NAME)
+$(REMOVE_SSH_TARGET):
+	if [ -n "$(SSH_CID)" ]; then \
+		$(DOCKER) stop $(SSH_NAME) ; \
+		$(DOCKER) rm $(SSH_NAME) ; \
+	fi
 
 # Launch a login shell in the image.
 .PHONY: shell
 shell: ssh
-	$(SSH) -X $(SSH_IP) $(CMD)
+	$(SSH) -X $(SSH_IP) "$(CMD)"
 
 # Launch a GUI session.
 .PHONY: gui
@@ -110,3 +120,17 @@ gui: ssh
 	$(SSH) -X $(SSH_IP) xinit /usr/bin/lxsession -e LXDE -s Lubuntu -- \
 		/usr/bin/Xephyr -screen $(GUI_SCREEN)
 
+# Run a roslaunch file
+.PHONY: launch
+launch: ssh
+	$(SSH) -X $(SSH_IP) 'roslaunch $(PKG) $(LAUNCH) $(PARAMS)'
+
+# Build the actual software
+.PHONY: build
+build: ssh
+	$(SSH) $(SSH_IP) 'cd ~/workspace && catkin_make $(CM_ARGS)'
+
+# Run the tests
+.PHONY: test
+test: ssh
+	$(SSH) $(SSH_IP) 'cd ~/workspace && catkin_make run_tests'
