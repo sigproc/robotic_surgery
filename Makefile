@@ -21,6 +21,9 @@ PROJECT ?= robotic_surgery
 # The size of the GUI screen
 GUI_SCREEN ?= 1440x960
 
+# Any other options to pass to Xephyr
+XEPHYR_OPTS ?=
+
 # Override to run a specific command in the container via make shell
 CMD ?=
 
@@ -126,7 +129,7 @@ gui: ssh
 	echo "$(GUI_CMD)" > "$(TMP)"
 	$(SCP) $(TMP) ros@$(SSH_IP):/home/ros/gui-command.sh
 	$(SSH) -X $(SSH_IP) xinit /usr/bin/lxsession -e LXDE -s Lubuntu -- \
-		/usr/bin/Xephyr -screen $(GUI_SCREEN)
+		/usr/bin/Xephyr -screen $(GUI_SCREEN) $(XEPHYR_OPTS)
 	rm -f $(TMP)
 
 # Run a roslaunch file
