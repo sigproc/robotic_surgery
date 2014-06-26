@@ -9,5 +9,9 @@
     <arg name="model" value="$(arg model)" />
     <arg name="gui" value="True" />
   </include>
+
+  <!-- publish a static transform for /base_link relative to /world_link -->
+  <node pkg="tf" type="static_transform_publisher" name="base_link_broadcaster"
+    args="0 0 0 0 0 0 world_link base_link 100" />
 </launch>
 

@@ -41,6 +41,10 @@ ADD ./config/ssh /home/ros/.ssh
 RUN chown -R ros:ros /home/ros/.ssh
 RUN chmod -R og-rwx /home/ros/.ssh
 
+# Copy autostart config
+ADD ./config/autostart /home/ros/.config/autostart
+RUN chown -R ros:ros /home/ros/.config/autostart
+
 # Copy ROS source code to ROS workspace
 ADD ./ros /home/ros/workspace/src/robotic_surgery
 RUN chown -R ros:ros /home/ros/workspace/src/robotic_surgery

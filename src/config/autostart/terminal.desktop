@@ -1,0 +1,8 @@
+# Start a terminal emulator on a GUI session launch
+
+[Desktop Entry]
+Type=Application
+Name=Terminal Emilator
+NoDisplay=true
+Exec=lxterminal
+
