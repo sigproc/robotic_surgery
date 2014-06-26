@@ -128,9 +128,9 @@ gui: TMP := $(shell mktemp -t gui-cmd-robotic-surgery.XXXXXX)
 gui: ssh
 	echo "$(GUI_CMD)" > "$(TMP)"
 	$(SCP) $(TMP) ros@$(SSH_IP):/home/ros/gui-command.sh
+	rm -f $(TMP)
 	$(SSH) -X $(SSH_IP) xinit /usr/bin/lxsession -e LXDE -s Lubuntu -- \
 		/usr/bin/Xephyr -screen $(GUI_SCREEN) $(XEPHYR_OPTS)
-	rm -f $(TMP)
 
 # Run a roslaunch file
 .PHONY: launch gui_launch
