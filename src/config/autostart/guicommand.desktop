@@ -4,5 +4,5 @@
 Type=Application
 Name=Terminal Emilator
 NoDisplay=true
-Exec=lxterminal
+Exec=lxterminal -e bash /home/ros/gui-command.sh
 

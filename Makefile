@@ -24,6 +24,9 @@ GUI_SCREEN ?= 1440x960
 # Override to run a specific command in the container via make shell
 CMD ?=
 
+# Override to run a specific command in the container via make gui
+GUI_CMD ?= bash
+
 # Override to pass additional arguments to catkin_make via make build
 CM_ARGS ?=
 
@@ -59,7 +62,9 @@ SSH_IMAGE_ID := $(shell $(SSH_IMAGE_ID_CMD))
 IMAGE_ID_CMD := $(DOCKER) inspect -f '{{ .Id }}' $(PROJECT_IMAGE) 2>/dev/null
 
 # Launch a SSH session into the container
-SSH := ssh -o StrictHostKeyChecking=no -i config/ros_user_ssh_key -l ros
+SSH_OPTS := -o StrictHostKeyChecking=no -i config/ros_user_ssh_key
+SSH := ssh $(SSH_OPTS) -l ros
+SCP := scp $(SSH_OPTS)
 
 # Name of the "delete my work" target
 REMOVE_SSH_TARGET := delete_all_my_work
@@ -116,14 +121,21 @@ shell: ssh
 
 # Launch a GUI session.
 .PHONY: gui
+gui: TMP := $(shell mktemp -t gui-cmd-robotic-surgery.XXXXXX)
 gui: ssh
+	echo "$(GUI_CMD)" > "$(TMP)"
+	$(SCP) $(TMP) ros@$(SSH_IP):/home/ros/gui-command.sh
 	$(SSH) -X $(SSH_IP) xinit /usr/bin/lxsession -e LXDE -s Lubuntu -- \
 		/usr/bin/Xephyr -screen $(GUI_SCREEN)
+	rm -f $(TMP)
 
 # Run a roslaunch file
-.PHONY: launch
+.PHONY: launch gui_launch
 launch: ssh
 	$(SSH) -X $(SSH_IP) 'roslaunch $(PKG) $(LAUNCH) $(PARAMS)'
+
+gui_launch: GUI_CMD := roslaunch $(PKG) $(LAUNCH) $(PARAMS)
+gui_launch: gui
 
 # Build the actual software
 .PHONY: build
