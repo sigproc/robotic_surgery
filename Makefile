@@ -1,5 +1,3 @@
-.PHONY: default help build shell root_shell gui _gui
-
 .DEFAULT: default
 
 ### CUSTOMISABLE VARIABLES
@@ -23,11 +21,8 @@ PROJECT ?= robotic_surgery
 # The size of the GUI screen
 GUI_SCREEN ?= 1440x960
 
-# The VNC viewer command. Should accept a host:display style option
-VNC_VIEWER ?= vncviewer
-
-# Arguments to pass to roslaunch
-LAUNCH ?=
+# Override to run a specific command in the container via make shell
+CMD ?=
 
 ### DERIVED VARIABLES
 #
@@ -41,59 +36,77 @@ DOCKER_RUN_COMMON := $(DOCKER) run -it --privileged
 DOCKER_RUN_ROS := -u ros -w /home/ros/workspace -e HOME=/home/ros "$(PROJECT_IMAGE)"
 DOCKER_RUN_ROOT := -u root "$(PROJECT_IMAGE)"
 
-# Locations and values of various temporary variables files
-SSH_CID_FILE := .ssh_container_id
-SSH_CID = $(shell cat $(SSH_CID_FILE))
-SSH_IP = $(shell $(DOCKER) inspect -f '{{ .NetworkSettings.IPAddress }}' $(SSH_CID))
+# Name of the SSH container and its associated container id, start image and IP address
+SSH_NAME := $(WHOAMI)_$(PROJECT)_ssh
 
-# The id for the image we have built
-BUILD_IMAGE_ID = $(shell $(DOCKER) inspect -f '{{ Id }}' $(PROJECT_IMAGE))
+SSH_CID_CMD := $(DOCKER) inspect -f '{{ .Id }}' $(SSH_NAME) 2>/dev/null
+SSH_IMAGE_ID_CMD := $(DOCKER) inspect -f '{{ .Image }}' $(SSH_NAME) 2>/dev/null
+SSH_IP_CMD := $(DOCKER) inspect -f '{{ .NetworkSettings.IPAddress }}' $(SSH_NAME) 2>/dev/null
 
-# The id for the image which the ssh container is currently running in
-SSH_IMAGE_ID = $(shell $(DOCKER) inspect -f '{{ Image }}' $(SSH_CID))
+SSH_CID := $(shell $(SSH_CID_CMD))
+SSH_IP := $(shell $(SSH_IP_CMD))
+SSH_IMAGE_ID := $(shell $(SSH_IMAGE_ID_CMD))
+
+# The id for the image we have built.
+IMAGE_ID_CMD := $(DOCKER) inspect -f '{{ .Id }}' $(PROJECT_IMAGE) 2>/dev/null
 
 # Launch a SSH session into the container
-SSH := ssh -o StrictHostKeyChecking=no -i config/ssh/id_rsa -l ros
+SSH := ssh -o StrictHostKeyChecking=no -i config/ros_user_ssh_key -l ros
 
-# Command used to launch a login shell into the image
-LOGIN_RUN_OPTS = $(COMMON_RUN_OPTS) /bin/bash -l
+# Name of the "delete my work" target
+REMOVE_SSH_TARGET := delete_all_my_work
 
-BUILD_RUN_OPTS = $(COMMON_RUN_OPTS) /bin/bash -c \
-		'source ~/workspace/devel/setup.bash; catkin_make'
+.PHONY: default
+default: image
 
-TEST_RUN_OPTS = $(COMMON_RUN_OPTS) /bin/bash -c \
-		'source ~/workspace/devel/setup.bash; catkin_make run_tests'
+.PHONY: image
+image:
+	$(DOCKER) build -t $(PROJECT_IMAGE) src
 
-default: build
+# We have to do this curious "double rule" here because the $(shell ...)
+# functions are evaluated at the *start* of the rule no matter where within the
+# rule they occur.
+.PHONY: ssh $(REMOVE_SSH_TARGET)
+.PHONY: _existing_ssh_container _launch_ssh_container_if_necessary _ssh_container_valid
+_launch_ssh_container_if_necessary: image
+	@if [ -z "$(SSH_CID)" ] ; then \
+		$(DOCKER_RUN_COMMON) --name=$(SSH_NAME) -d -p 22 $(DOCKER_RUN_ROOT) \
+			/usr/sbin/sshd -D ; \
+	fi
 
-# Build Docker image from our top-level Dockerfile
-build:
-	$(DOCKER) build -t $(PROJECT_IMAGE) .
-	@echo "Docker image built. Id: $(BUILD_IMAGE_ID)"
+_existing_ssh_container: _launch_ssh_container_if_necessary
+	$(eval SSH_CID := $(shell $(SSH_CID_CMD)))
+	$(eval SSH_IP := $(shell $(SSH_IP_CMD)))
+	$(eval SSH_IMAGE_ID := $(shell $(SSH_IMAGE_ID_CMD)))
 
-ssh: $(SSH_IP_FILE)
-	@echo Log into container as ros@$(SSH_IP)
+_ssh_container_valid: image _existing_ssh_container
+	$(eval IMAGE_ID := $(shell $(IMAGE_ID_CMD)))
+	@if [ "$(SSH_IMAGE_ID)" != "$(IMAGE_ID)" ] ; then \
+		echo "The current SSH container is for an old version of the build image." ; \
+		echo "Remove it with\n" ; \
+		echo "    $(MAKE) $(REMOVE_SSH_TARGET)\n" ; \
+		echo "and try again." ; \
+		echo "**IMPORTANT** THIS WILL DELETE ANY LOCAL CHANGES IN THE CONTAINER!" ; \
+		false ; \
+	fi
 
-$(CONTAINER_DIR): build
-	mkdir -p .container
+ssh: _ssh_container_valid
+	scripts/wait_port.sh $(SSH_IP) 22
+	@echo "SSH started. Log in with\n"
+	@echo "    $(SSH) $(SSH_IP)"
 
-$(SSH_CID_FILE): $(CONTAINER_DIR)
-	echo $(BUILD_IMAGE_ID) > $(SSH_IMAGE_ID_FILE)
-	$(DOCKER_RUN_COMMON) -d -p 22 $(DOCKER_RUN_ROOT) /usr/sbin/sshd -D > $(SSH_CID_FILE)
-
-$(SSH_IP_FILE): $(SSH_CID_FILE)
-	$(DOCKER) inspect -f '{{ .NetworkSettings.IPAddress }}' $(SSH_CID) > $(SSH_IP_FILE)
+$(REMOVE_SSH_TARGET): _existing_ssh_container
+	$(DOCKER) stop $(SSH_NAME)
+	$(DOCKER) rm $(SSH_NAME)
 
 # Launch a login shell in the image.
-shell: build
-	$(DOCKER_RUN_COMMON) -P --rm $(DOCKER_RUN_ROS) bash -l
-
-# Launch a login shell in the image as the root user.
-root_shell: build
-	$(DOCKER_RUN_COMMON) -P --rm $(DOCKER_RUN_ROOT) bash -l
+.PHONY: shell
+shell: ssh
+	$(SSH) -X $(SSH_IP) $(CMD)
 
 # Launch a GUI session.
+.PHONY: gui
 gui: ssh
-	scripts/wait_port.sh $(SSH_IP) 22
-	$(SSH) $(SSH_IP) -X xinit /usr/bin/lxsession -e LXDE -s Lubuntu -- \
+	$(SSH) -X $(SSH_IP) xinit /usr/bin/lxsession -e LXDE -s Lubuntu -- \
 		/usr/bin/Xephyr -screen $(GUI_SCREEN)
+
