@@ -41,6 +41,20 @@ DOCKER_RUN_COMMON := $(DOCKER) run -it --privileged
 DOCKER_RUN_ROS := -u ros -w /home/ros/workspace -e HOME=/home/ros "$(PROJECT_IMAGE)"
 DOCKER_RUN_ROOT := -u root "$(PROJECT_IMAGE)"
 
+# Locations and values of various temporary variables files
+SSH_CID_FILE := .ssh_container_id
+SSH_CID = $(shell cat $(SSH_CID_FILE))
+SSH_IP = $(shell $(DOCKER) inspect -f '{{ .NetworkSettings.IPAddress }}' $(SSH_CID))
+
+# The id for the image we have built
+BUILD_IMAGE_ID = $(shell $(DOCKER) inspect -f '{{ Id }}' $(PROJECT_IMAGE))
+
+# The id for the image which the ssh container is currently running in
+SSH_IMAGE_ID = $(shell $(DOCKER) inspect -f '{{ Image }}' $(SSH_CID))
+
+# Launch a SSH session into the container
+SSH := ssh -o StrictHostKeyChecking=no -i config/ssh/id_rsa -l ros
+
 # Command used to launch a login shell into the image
 LOGIN_RUN_OPTS = $(COMMON_RUN_OPTS) /bin/bash -l
 
@@ -55,10 +69,20 @@ default: build
 # Build Docker image from our top-level Dockerfile
 build:
 	$(DOCKER) build -t $(PROJECT_IMAGE) .
+	@echo "Docker image built. Id: $(BUILD_IMAGE_ID)"
 
-ssh: build
-	ssh_cid=`$(DOCKER_RUN_COMMON) -d -p 22 $(DOCKER_RUN_ROOT) /usr/sbin/sshd -D` ; \
-	echo "SSH server launched on `$(DOCKER) inspect -f '{{ .NetworkSettings.IPAddress }}' $$ssh_cid`"
+ssh: $(SSH_IP_FILE)
+	@echo Log into container as ros@$(SSH_IP)
+
+$(CONTAINER_DIR): build
+	mkdir -p .container
+
+$(SSH_CID_FILE): $(CONTAINER_DIR)
+	echo $(BUILD_IMAGE_ID) > $(SSH_IMAGE_ID_FILE)
+	$(DOCKER_RUN_COMMON) -d -p 22 $(DOCKER_RUN_ROOT) /usr/sbin/sshd -D > $(SSH_CID_FILE)
+
+$(SSH_IP_FILE): $(SSH_CID_FILE)
+	$(DOCKER) inspect -f '{{ .NetworkSettings.IPAddress }}' $(SSH_CID) > $(SSH_IP_FILE)
 
 # Launch a login shell in the image.
 shell: build
@@ -69,14 +93,7 @@ root_shell: build
 	$(DOCKER_RUN_COMMON) -P --rm $(DOCKER_RUN_ROOT) bash -l
 
 # Launch a GUI session.
-gui: build
-	gui_cid=`$(DOCKER_RUN_COMMON) -p 5900 -d $(DOCKER_RUN_ROS) \
-		src/robotic_surgery/scripts/launch_gui.sh $(GUI_SCREEN) lxterminal` ; \
-	echo "Spawned GUI container $$gui_cid" ; \
-	gui_ip=`$(DOCKER) inspect -f '{{ .NetworkSettings.IPAddress }}' $$gui_cid` ; \
-	echo "IP address is $$gui_ip" ; \
-	scripts/wait_port.sh $$gui_ip 5900; $(VNC_VIEWER) $$gui_ip:0 ; \
-	$(DOCKER) logs $$gui_cid ; \
-	echo "Killing $$gui_cid..." ; \
-	$(DOCKER) kill $$gui_cid ; \
-	$(DOCKER) rm $$gui_cid ;
+gui: ssh
+	scripts/wait_port.sh $(SSH_IP) 22
+	$(SSH) $(SSH_IP) -X xinit /usr/bin/lxsession -e LXDE -s Lubuntu -- \
+		/usr/bin/Xephyr -screen $(GUI_SCREEN)
