@@ -31,6 +31,7 @@ RUN apt-get -y install ros-hydro-moveit-full \
     gazebo ros-hydro-gazebo-ros \
     lubuntu-core lxterminal openssh-server xserver-xephyr \
     openrave0.8-dp-plugin-oderave openrave0.8-dp-plugin-textserver
+RUN apt-get -y install gtk2-engines gtk2-engines-pixbuf
 
 # Comment out annoying line which stops .bashrc from sourcing for
 # non-interactive shells.
