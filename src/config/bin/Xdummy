@@ -1,0 +1,35 @@
+#!/bin/bash
+
+geom="1280x800"
+
+PARAMS=();
+while (( "$#" )); do
+    arg="$1"
+    shift
+
+    case "$arg" in
+    -geometry)
+        geom="$1"
+        shift
+        ;;
+    *)
+        PARAMS=("${PARAMS[@]}" "$arg")
+        ;;
+    esac
+done
+
+# Copy config to temporary location
+CONFIG_TMP=`mktemp -t xorg-dummy.XXXXXX.conf`
+echo "Xdummy: making temporary config at ${CONFIG_TMP}"
+
+cp /etc/X11/xorg-dummy.conf "${CONFIG_TMP}"
+
+# Modify config
+sed -i -e "s/Modes.*# GUI_GEOM/Modes \"${geom}\" # GUI_GEOM/" ${CONFIG_TMP}
+
+LOG_TMP=`mktemp -t Xdummy.XXXXXX.log`
+
+echo "Xdummy: logging to ${LOG_TMP}"
+exec /usr/bin/Xorg \
+    -noreset +extension GLX +extension RANDR +extension RENDER \
+    -config "${CONFIG_TMP}" -logfile "${LOG_TMP}" ${PARAMS[@]}
