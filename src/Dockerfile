@@ -32,19 +32,35 @@ RUN apt-get -y install ros-hydro-moveit-full \
     lubuntu-core lxterminal openssh-server xserver-xephyr \
     openrave0.8-dp-plugin-oderave openrave0.8-dp-plugin-textserver
 RUN apt-get -y install gtk2-engines gtk2-engines-pixbuf
+RUN apt-get -y install x11vnc
+RUN apt-get -y install xserver-xorg-video-dummy xserver-xorg-input-void
+RUN apt-get -y install xvfb
 
 # Comment out annoying line which stops .bashrc from sourcing for
 # non-interactive shells.
 RUN sed -i 's/\[ -z "$PS1" \] && return/# &/' /home/ros/.bashrc
 
+# Allow ros user to start the X server
+RUN sed -i 's/allowed_users=console/allowed_users=anybody/' /etc/X11/Xwrapper.config
+
+# Add ros user to video group so that they can access the video card directly and the
+# dialout group so that they can access the serial port.
+RUN usermod -a -G video,dialout ros
+
 # Copy ssh config
-ADD ./config/ssh /home/ros/.ssh
+ADD config/ssh /home/ros/.ssh
 RUN chown -R ros:ros /home/ros/.ssh
 RUN chmod -R og-rwx /home/ros/.ssh
 
 # Copy autostart config
-ADD ./config/autostart /home/ros/.config/autostart
+ADD config/autostart /home/ros/.config/autostart
 RUN chown -R ros:ros /home/ros/.config/autostart
+
+# Copy X config
+ADD config/X11 /etc/X11
+
+# Copy local executables
+ADD config/bin/Xdummy /usr/bin/
 
 # Copy ROS source code to ROS workspace
 ADD ./ros /home/ros/workspace/src/robotic_surgery

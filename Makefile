@@ -19,10 +19,12 @@ TAG ?= $(shell git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "latest")
 PROJECT ?= robotic_surgery
 
 # The size of the GUI screen
-GUI_SCREEN ?= 1440x960
+GUI_SCREEN ?= 1440x900
 
-# Any other options to pass to Xephyr
-XEPHYR_OPTS ?=
+VNC_VIEWER ?= vncviewer
+
+# Any other options to pass to vncviewer
+VNC_VIEWER_OPTS ?=
 
 # Override to run a specific command in the container via make shell
 CMD ?=
@@ -56,6 +58,9 @@ DOCKER_RUN_COMMON := $(DOCKER) run -it --privileged -P -v /dev/dri:/dev/dri
 # Run a command in the image as ros or root.
 DOCKER_RUN_ROS := -u ros -w /home/ros/workspace -e HOME=/home/ros "$(PROJECT_IMAGE)"
 DOCKER_RUN_ROOT := -u root "$(PROJECT_IMAGE)"
+
+# The IP address of the host Docker instance
+HOST_IP := $(shell ip -4 -o addr show dev docker0 | awk -e '{ print $$4 }' | sed -e 's_/[0-9]\+__')
 
 # Name of the SSH container and its associated container id, start image and IP address
 SSH_NAME := $(WHOAMI)_$(PROJECT)_ssh
@@ -132,15 +137,21 @@ $(REMOVE_SSH_TARGET):
 shell: ssh
 	$(SSH) -X $(SSH_IP) "$(CMD)"
 
-# Launch a GUI session.
+# Launch a GUI session. This does some horrible magic in order to launch a SSH
+# session into the container, send it to the background, launch vncviewer and
+# then, after vncviewer exits, kill the original SSH session.
 .PHONY: gui
-gui: TMP := $(shell mktemp -t gui-cmd-robotic-surgery.XXXXXX)
+gui: GUI_CMD_TMP := $(shell mktemp -t gui-cmd-robotic-surgery.XXXXXX)
 gui: ssh
-	echo "$(GUI_CMD)" > "$(TMP)"
-	$(SCP) $(TMP) ros@$(SSH_IP):/home/ros/gui-command.sh
-	rm -f $(TMP)
-	$(SSH) -X $(SSH_IP) xinit /usr/bin/lxsession -e LXDE -s Lubuntu -- \
-		/usr/bin/Xephyr -screen $(GUI_SCREEN) $(XEPHYR_OPTS)
+	echo "$(GUI_CMD)" > "$(GUI_CMD_TMP)"
+	$(SCP) $(GUI_CMD_TMP) ros@$(SSH_IP):/home/ros/gui-command.sh
+	rm -f $(GUI_CMD_TMP)
+	$(SSH) $(SSH_IP) x11vnc -forever -xdummy \
+			-env FD_PROG=\"/usr/bin/lxsession -e LXDE -s Lubuntu\" \
+			-env FD_GEOM=\"${GUI_SCREEN}\" & \
+		scripts/wait_port.sh $(SSH_IP) 5900 && \
+		$(VNC_VIEWER) $(VNC_VIEWER_OPTS) $(SSH_IP) ; \
+		$(SSH) $(SSH_IP) killall lxsession
 
 # Run a roslaunch file
 .PHONY: launch gui_launch
