@@ -45,8 +45,15 @@ PARAMS ?=
 # Name of image to build.
 PROJECT_IMAGE := $(WHOAMI)/$(PROJECT):$(TAG)
 
+# Docker run options:
+#  -it			allocate a pseudo TTY and keep stdin open on interactive
+#			sessions (mosly useful for debugging)
+#  --privileged		allow container to access hardware
+#  -P			open all network ports on the container
+#  -v /dev/dri:...	allow X server within container to talk to graphics card
+DOCKER_RUN_COMMON := $(DOCKER) run -it --privileged -P -v /dev/dri:/dev/dri
+
 # Run a command in the image as ros or root.
-DOCKER_RUN_COMMON := $(DOCKER) run -it --privileged
 DOCKER_RUN_ROS := -u ros -w /home/ros/workspace -e HOME=/home/ros "$(PROJECT_IMAGE)"
 DOCKER_RUN_ROOT := -u root "$(PROJECT_IMAGE)"
 
@@ -84,9 +91,12 @@ image:
 # rule they occur.
 .PHONY: ssh $(REMOVE_SSH_TARGET)
 .PHONY: _existing_ssh_container _launch_ssh_container_if_necessary _ssh_container_valid
+
+# If a ssh container is not running, launch one. We give it the fixed name
+# $(SSH_NAME) and run it in detached mode.
 _launch_ssh_container_if_necessary: image
 	@if [ -z "$(SSH_CID)" ] ; then \
-		$(DOCKER_RUN_COMMON) --name=$(SSH_NAME) -d -p 22 $(DOCKER_RUN_ROOT) \
+		$(DOCKER_RUN_COMMON) --name=$(SSH_NAME) -d $(DOCKER_RUN_ROOT) \
 			/usr/sbin/sshd -D ; \
 	fi
 
