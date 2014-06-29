@@ -59,9 +59,6 @@ DOCKER_RUN_COMMON := $(DOCKER) run -it --privileged -P -v /dev/dri:/dev/dri
 DOCKER_RUN_ROS := -u ros -w /home/ros/workspace -e HOME=/home/ros "$(PROJECT_IMAGE)"
 DOCKER_RUN_ROOT := -u root "$(PROJECT_IMAGE)"
 
-# The IP address of the host Docker instance
-HOST_IP := $(shell ip -4 -o addr show dev docker0 | awk -e '{ print $$4 }' | sed -e 's_/[0-9]\+__')
-
 # Name of the SSH container and its associated container id, start image and IP address
 SSH_NAME := $(WHOAMI)_$(PROJECT)_ssh
 
