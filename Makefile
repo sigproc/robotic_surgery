@@ -77,6 +77,7 @@ IMAGE_ID_CMD := $(DOCKER) inspect -f '{{ .Id }}' $(PROJECT_IMAGE) 2>/dev/null
 SSH_OPTS := -o StrictHostKeyChecking=no -i config/ros_user_ssh_key
 SSH := ssh $(SSH_OPTS) -l ros
 SCP := scp $(SSH_OPTS)
+SFTP := sftp $(SSH_OPTS)
 
 # Name of the "delete my work" target
 REMOVE_SSH_TARGET := delete_all_my_work
@@ -133,6 +134,10 @@ $(REMOVE_SSH_TARGET):
 .PHONY: shell
 shell: ssh
 	$(SSH) -X $(SSH_IP) "$(CMD)"
+
+# Launch an SFTP client in the image.
+sftp: ssh
+	$(SFTP) ros@$(SSH_IP)
 
 # Launch a GUI session. This does some horrible magic in order to launch a SSH
 # session into the container, send it to the background, launch vncviewer and
