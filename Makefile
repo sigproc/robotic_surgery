@@ -52,8 +52,13 @@ PROJECT_IMAGE := $(WHOAMI)/$(PROJECT):$(TAG)
 #			sessions (mosly useful for debugging)
 #  --privileged		allow container to access hardware
 #  -P			open all network ports on the container
-#  -v /dev/dri:...	allow X server within container to talk to graphics card
-DOCKER_RUN_COMMON := $(DOCKER) run -it --privileged -P -v /dev/dri:/dev/dri -v /dev/ttyUSB0:/dev/ttyUSB0
+DOCKER_RUN_COMMON := $(DOCKER) run -it --privileged -P
+
+# If /dev/ttyUSB0 exists on the host, expose it to the container. This is the
+# USB serial interface used to talk to the dynamixel bus.
+ifneq (,$(wildcard /dev/ttyUSB0))
+	DOCKER_RUN_COMMON += -v /dev/ttyUSB0:/dev/ttyUSB0
+endif
 
 # Run a command in the image as ros or root.
 DOCKER_RUN_ROS := -u ros -w /home/ros/workspace -e HOME=/home/ros "$(PROJECT_IMAGE)"
