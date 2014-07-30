@@ -53,7 +53,7 @@ PROJECT_IMAGE := $(WHOAMI)/$(PROJECT):$(TAG)
 #  --privileged		allow container to access hardware
 #  -P			open all network ports on the container
 #  -v /dev/dri:...	allow X server within container to talk to graphics card
-DOCKER_RUN_COMMON := $(DOCKER) run -it --privileged -P -v /dev/dri:/dev/dri
+DOCKER_RUN_COMMON := $(DOCKER) run -it --privileged -P -v /dev/dri:/dev/dri -v /dev/ttyUSB0:/dev/ttyUSB0
 
 # Run a command in the image as ros or root.
 DOCKER_RUN_ROS := -u ros -w /home/ros/workspace -e HOME=/home/ros "$(PROJECT_IMAGE)"
