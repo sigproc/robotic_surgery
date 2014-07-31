@@ -56,7 +56,8 @@ DOCKER_RUN_COMMON := $(DOCKER) run -it --privileged -P
 
 # If /dev/ttyUSB0 exists on the host, expose it to the container. This is the
 # USB serial interface used to talk to the dynamixel bus.
-ifneq (,$(wildcard /dev/ttyUSB0))
+USB_DEVICE:=/dev/ttyUSB0
+ifneq (,$(wildcard $(USB_DEVICE)))
 	DOCKER_RUN_COMMON += -v /dev/ttyUSB0:/dev/ttyUSB0
 endif
 
