@@ -28,7 +28,6 @@
                 shoulder_pitch_controller
                 elbow_flex_controller
                 wrist_roll_controller
-                right_finger_controller
-                left_finger_controller"
-          output="screen"/>
+                claw_controller"
+                output="screen"/>
 </launch>

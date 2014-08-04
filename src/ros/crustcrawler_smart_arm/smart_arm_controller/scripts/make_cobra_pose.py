@@ -43,15 +43,26 @@ joint_names = ('shoulder_pan_controller',
                'shoulder_pitch_controller',
                'elbow_flex_controller',
                'wrist_roll_controller',
-               'left_finger_controller',
-               'right_finger_controller')
-               
-joint_commands = (0.0, 1.972222, -1.972222, 0.0, 0.0, 0.0)
+               'claw_controller')
+
+joint_commands = [
+        (0.0, 1.972222, -1.972222, 0.0, 0.0),
+        (0.0, 1.972222, -1.0, 0.0, 0.8),
+        (1.0, 1.972222, -1.972222, 0.0, 0.0),
+        (0.0, 0, 0, 0.0, 0.8),
+]
 
 if __name__ == '__main__':
     pubs = [rospy.Publisher(name + '/command', Float64) for name in joint_names]
     rospy.init_node('make_cobra_pose', anonymous=True)
     
-    for i in range(len(pubs)):
-        pubs[i].publish(joint_commands[i])
-        
+    r = rospy.Rate(0.5)
+    idx = 0
+    while not rospy.is_shutdown():
+        for i in range(len(pubs)):
+            pubs[i].publish(joint_commands[idx][i])
+        idx += 1
+        if idx >= len(joint_commands):
+            idx = 0
+
+        r.sleep()
