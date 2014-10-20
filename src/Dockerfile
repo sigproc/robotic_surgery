@@ -26,7 +26,6 @@ RUN apt-get -y update
 
 # Install additional packages
 RUN apt-get -y install ros-hydro-moveit-full \
-    apt-get install ros-hydro-moveit-full-pr2 \
     ros-hydro-dynamixel-motor ros-hydro-dynamixel-controllers \
     ros-hydro-ivcon ros-hydro-convex-decomposition \
     gazebo ros-hydro-gazebo-ros \
