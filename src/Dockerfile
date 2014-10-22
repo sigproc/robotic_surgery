@@ -38,7 +38,7 @@ RUN apt-get -y install xvfb
 
 # Comment out annoying line which stops .bashrc from sourcing for
 # non-interactive shells.
-RUN sed -i 's/\[ -z "$PS1" \] && return/# &/' /home/ros/.bashrc
+RUN sed -i 's/\[ -z "$PS1" \] && return/# &/' /home/ros/.bashrc 
 
 # Allow ros user to start the X server
 RUN sed -i 's/allowed_users=console/allowed_users=anybody/' /etc/X11/Xwrapper.config
