@@ -29,5 +29,5 @@
     required="true" />
 
   <!-- Make some movements -->
-  <node name="demo_motion" pkg="smart_arm_controller" type="auto_increment.py" />
+  <node name="demo_motion" pkg="smart_arm_controller" type="auto_increment_2joints.py" />
 </launch>
