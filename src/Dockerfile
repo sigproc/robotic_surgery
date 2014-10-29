@@ -36,6 +36,9 @@ RUN apt-get -y install x11vnc
 RUN apt-get -y install xserver-xorg-video-dummy xserver-xorg-input-void
 RUN apt-get -y install xvfb
 
+# USB webcam support
+RUN apt-get -y install ros-hydro-usb-cam
+
 # Comment out annoying line which stops .bashrc from sourcing for
 # non-interactive shells.
 RUN sed -i 's/\[ -z "$PS1" \] && return/# &/' /home/ros/.bashrc 
