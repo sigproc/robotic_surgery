@@ -39,6 +39,9 @@ RUN apt-get -y install xvfb
 # USB webcam support
 RUN apt-get -y install ros-hydro-usb-cam
 
+# JsonCPP library for k2_client
+RUN apt-get -y install libjsoncpp-dev
+
 # Comment out annoying line which stops .bashrc from sourcing for
 # non-interactive shells.
 RUN sed -i 's/\[ -z "$PS1" \] && return/# &/' /home/ros/.bashrc 
