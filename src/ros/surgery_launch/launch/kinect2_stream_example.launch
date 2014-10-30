@@ -1,0 +1,19 @@
+<launch>
+	<param name="serverNameOrIP" value="windle" />
+	<group ns="/head/kinect2">
+		<node name="startDepth" pkg="k2_client" type="startDepth"/>
+<!--
+		<node name="startRGB" pkg="k2_client" type="startRGB"/>
+		<node name="startIR" pkg="k2_client" type="startIR"/>
+		<node name="startBody" pkg="k2_client" type="startBody"/>
+		<node name="startAudio" pkg="k2_client" type="startAudio"/>
+-->
+	</group>
+
+<!--
+	<node pkg="image_view" type="image_view" name="rgb_view">
+		<remap from="image" to="head/kinect2/rgb/image_color" />
+		<param name="window_name" value="RGB" />
+	</node>
+-->
+</launch>
