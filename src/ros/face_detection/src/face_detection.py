@@ -42,7 +42,7 @@ def image_to_array(image):
 
     # TODO: support more image encodings
     if image.encoding != 'rgb8':
-        rospy.logerror(
+        rospy.logerr(
             'Image encoding "%s" not supported. '
             'Image must be in "rgb8" encoding.', image.encoding
         )
