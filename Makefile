@@ -68,6 +68,13 @@ ifneq (,$(wildcard $(VIDEO_DEVICE)))
 	DOCKER_RUN_COMMON += -v /dev/video0:/dev/video0
 endif
 
+# If /dev/video1 exists on the host, expose it to the container. This is the
+# USB interface used to talk to a USB webcam
+VIDEO_DEVICE:=/dev/video1
+ifneq (,$(wildcard $(VIDEO_DEVICE)))
+	DOCKER_RUN_COMMON += -v /dev/video1:/dev/video1
+endif
+
 # Run a command in the image as ros or root.
 DOCKER_RUN_ROS := -u ros -w /home/ros/workspace -e HOME=/home/ros "$(PROJECT_IMAGE)"
 DOCKER_RUN_ROOT := -u root "$(PROJECT_IMAGE)"
