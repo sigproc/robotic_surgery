@@ -1,0 +1,21 @@
+<launch>
+  # Create two nodes, "usb_cam_0" and "image_view_0" which read from
+  # /dev/video0 and show the result.
+  <node pkg="usb_cam" type="usb_cam_node" name="usb_cam_0">
+    <param name="video_device" value="/dev/video0" />
+  </node>
+  <node pkg="image_view" type="image_view" name="image_view_0">
+    <remap from="image" to="usb_cam_0/image_raw" />
+    <param name="window_name" value="camera 0" />
+  </node>
+
+  # Create two nodes, "usb_cam_1" and "image_view_1" which read from
+  # /dev/video1 and show the result.
+  <node pkg="usb_cam" type="usb_cam_node" name="usb_cam_1">
+    <param name="video_device" value="/dev/video1" />
+  </node>
+  <node pkg="image_view" type="image_view" name="image_view_1">
+    <remap from="image" to="usb_cam_1/image_raw" />
+    <param name="window_name" value="camera 1" />
+  </node>
+</launch>
