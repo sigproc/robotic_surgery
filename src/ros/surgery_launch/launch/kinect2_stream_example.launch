@@ -10,10 +10,8 @@
 -->
 	</group>
 
-<!--
-	<node pkg="image_view" type="image_view" name="rgb_view">
-		<remap from="image" to="head/kinect2/rgb/image_color" />
-		<param name="window_name" value="RGB" />
+  <node pkg="depth_view" type="depth_view.py" name="depth_view">
+		<remap from="image" to="head/kinect2/depth/image_raw" />
+		<param name="window_name" value="Depth image" />
 	</node>
--->
 </launch>
