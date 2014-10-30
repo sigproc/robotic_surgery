@@ -1,0 +1,10 @@
+<launch>
+	<param name="serverNameOrIP" value="172.19.179.53" />
+		<group ns="/head/kinect2">
+		<node name="startRGB" pkg="k2_client" type="startRGB"/>
+		<node name="startDepth" pkg="k2_client" type="startDepth"/>
+		<node name="startIR" pkg="k2_client" type="startIR"/>
+		<node name="startBody" pkg="k2_client" type="startBody"/>
+		<node name="startAudio" pkg="k2_client" type="startAudio"/>
+		</group>
+</launch>
