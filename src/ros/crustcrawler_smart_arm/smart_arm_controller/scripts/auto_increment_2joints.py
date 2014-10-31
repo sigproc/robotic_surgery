@@ -138,7 +138,6 @@ while iteration in range (2,2*length_of_commands-1):
         break
 
     iteration += 1
-    iteration += 1
     
 
 if __name__ == '__main__':
