@@ -48,12 +48,12 @@ joint_names = ('shoulder_pan_controller',
                'claw_controller')
                
 joint_commands = [
-        (0.5, 1.9722, -0.5, 0.0, 0.0),
-        (-0.5, 1.9722, -1.27, 0.0, 0.0),
-        (0.5, 1.9722, 0.2, 0.0, 0.0),
-        (-0.5, 1.9722, -2.2, 0.0, 0.0),
-        (-0.5, 1.9722, -2.2, 0.0, 0.0),
-        (-0.5, 1.9722, -2.2, 0.0, 0.0)
+        (-0.5, 1.9722, -0.5, 0.0, 0.0),
+        (0.5, 1.9722, -1.27, 0.0, 0.0),
+        (-0.5, 1.9722, 0.2, 0.0, 0.0),
+        (0.5, 1.9722, -2.2, 0.0, 0.0),
+        (-0.5, 1.9722, -0.5, 0.0, 0.0),
+        (0.5, 1.9722, -2.2, 0.0, 0.0)
 ]
 #length of commands
 length_of_commands = len(joint_commands)
@@ -94,7 +94,7 @@ for k in range (0,abs(c_inc)):
 ###PART 2 ###    
 #update c and run the next positions   
 iteration = 2  
-while iteration in range (2,length_of_commands):
+while iteration in range (2,2*length_of_commands-1):
     u = len(joint_commands_smooth)
     c = np.zeros((u,1))
     a = np.zeros((u,1))
@@ -117,7 +117,6 @@ while iteration in range (2,length_of_commands):
     a_inc = abs(int ((a[k+1]-a[k])/g))
     if (c_inc>a_inc): steps = c_inc
     else: steps = a_inc
-    
     k += 1
     for k in range (k,steps+k):
         k -= 1
@@ -138,6 +137,7 @@ while iteration in range (2,length_of_commands):
             break
         break
 
+    iteration += 1
     iteration += 1
     
 
