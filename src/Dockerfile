@@ -39,6 +39,9 @@ RUN apt-get -y install xvfb
 # USB webcam support
 RUN apt-get -y install ros-hydro-usb-cam
 
+# Install OpenCV libraries and the Python bindings
+RUN apt-get -y install libopencv-dev python-opencv
+
 # JsonCPP library for k2_client
 RUN apt-get -y install libjsoncpp-dev
 
