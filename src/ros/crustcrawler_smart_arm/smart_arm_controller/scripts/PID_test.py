@@ -53,7 +53,7 @@ joint_names = ('shoulder_pan_controller',
 pose = matrix((-0.9, 1.972222, -1.972222, 0.0, 0.0))
 #goal pose and step size
 joint_commands_goal = matrix((0.5, 1.1, -0.51, -1.97222, 1.0))
-kappa = 0.01
+kappa = 0.002
 
 if __name__ == '__main__':
     pubs = [rospy.Publisher(name + '/command', Float64) for name in joint_names]
@@ -66,7 +66,7 @@ if __name__ == '__main__':
     rospy.sleep(8)
     
     #Control the robot to the goal position
-    r = rospy.Rate(10)
+    r = rospy.Rate(50)
     idx = 0
 
     while not rospy.is_shutdown():
