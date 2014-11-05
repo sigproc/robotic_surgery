@@ -51,19 +51,25 @@ joint_names = ('shoulder_pan_controller',
 
 #Initialise, measure in practice
 pose = matrix((-0.9, 1.972222, -1.972222, 0.0, 0.0))
+#goal pose and step size
+joint_commands_goal = matrix((0.5, 1.1, -0.51, -1.97222, 1.0))
+kappa = 0.01
 
 if __name__ == '__main__':
     pubs = [rospy.Publisher(name + '/command', Float64) for name in joint_names]
-    rospy.init_node('make_cobra_pose', anonymous=True)
-  
+    rospy.init_node('make_goal_pose', anonymous=True)
+    
+    #publish the initial state to the robot first and sleep for 8 secs
+    for i in range(len(pubs)):
+        pubs[i].publish(pose[0,i])
+        
+    rospy.sleep(8)
+    
+    #Control the robot to the goal position
     r = rospy.Rate(10)
     idx = 0
 
     while not rospy.is_shutdown():
-        #goal pose
-        joint_commands_goal = matrix((0.5, 1.1, -0.51, -1.97222, 1.0))
-        kappa = 0.01
-
         delta = joint_commands_goal - pose
         delta_mag = np.linalg.norm(delta)
 
