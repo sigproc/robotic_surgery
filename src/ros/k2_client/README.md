@@ -110,6 +110,3 @@ The k2_client package contains 5 nodes, each of which exposes a number of differ
 * **startBody**
   - bodyArray
 
-
-
-
