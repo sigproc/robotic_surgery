@@ -167,7 +167,7 @@
             <visual>
                 <origin xyz="0.0 0.0 0.005" rpy="0 0 0" />
                 <geometry>
-                    <mesh filename="package://smart_arm_description/meshes/collada/arm_shoulder_pan.dae"/>
+                    <mesh filename="package://smart_arm_description/meshes/arm_pan_1.stl"/>
                 </geometry>
                 <material name="Grey" />
             </visual>
@@ -175,7 +175,7 @@
             <collision>
                 <origin xyz="0.0 0.0 0.0" rpy="0 0 0" />
                 <geometry>
-                    <mesh filename="package://smart_arm_description/meshes/collada/arm_shoulder_pan.dae"/>
+                    <mesh filename="package://smart_arm_description/meshes/arm_pan_1.stl"/>
                 </geometry>
             </collision>
         </link>
@@ -280,6 +280,7 @@
             </collision>
         </link>
         
+
         <link name="arm_left_finger_link">
             <inertial>
                 <mass value="0.0225" />
@@ -292,7 +293,7 @@
             <visual>
                 <origin xyz="0.0 0.0 0.0" rpy="0 0 0" />
                 <geometry>
-                    <mesh filename="package://smart_arm_description/meshes/collada/arm_left_finger.dae"/>
+                    <mesh filename="package://smart_arm_description/meshes/claw.stl"/>
                 </geometry>
                 <material name="Green" />
             </visual>
@@ -305,6 +306,8 @@
             </collision>
         </link>
         
+	
+
         <!-- ****** TRANSMISSION DEFINITIONS ****** -->
         
         <transmission type="pr2_mechanism_model/SimpleTransmission" name="shoulder_pan_trans">
@@ -388,6 +391,11 @@
             <kd value="1.0" />
         </gazebo>
         
+	<gazebo reference="left_claw_link">
+            <material>SmartArm/GunMetalBrushedAluminum</material>
+            <turnGravityOff>true</turnGravityOff>
+        </gazebo>
+
         <gazebo reference="shoulder_pan_joint">
             <stopKd value="1.0" />
             <stopKp value="1000000.0" />
