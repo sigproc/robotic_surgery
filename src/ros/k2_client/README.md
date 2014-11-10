@@ -3,8 +3,7 @@ This ROS package is part of a two part software package which allows data to be 
 
 Both the server and client components were developed by [Personal Robotics Lab](https://personalrobotics.ri.cmu.edu/). 
 
-# Installing the software
-## Server side
+## Installation - Server side
 On the Windows machine:
 The server software can be installed and run in two ways: either by downloading the source code and manually building, or by using pre-built binaries. For the robotic surgery course we used the source code for greater flexibility.
 
@@ -54,7 +53,7 @@ For the robotic_surgery project these files are automatically installed inside t
 5. Run the package using 
 `roslaunch k2_client kinect2Client.launch` 
 
-# Using K2 Client
+### Using K2 Client
 To run the software and stream Kinect data, you may wish to follow the following workflow:
 1. Check that the Kinect is working correctly on the Windows machine
 
@@ -65,48 +64,51 @@ To run the software and stream Kinect data, you may wish to follow the following
 On the Linux machine:
 4. Launch the required k2_client nodes, either using the k2_client.launch file or a custom launch file.
 >> Make sure to set the IP address of the server machine by adding
-`<param name="serverNameOrIP" value="my-ip-address" />` to your launch file. <<
+`<param name="serverNameOrIP" value="my-ip-address" />` to your launch file.
 
 
-### Nodes
+## Nodes
 The k2_client package contains 5 nodes, each of which exposes a number of different topics. All topics are prefixed by /head/kinect2.
-| Node        	| Topics            |
-|---------------|-------------------|
-|startRGB     	|| rgb/camera_info
-rgb/image_color
-rgb/image_color/compressed
-rgb/image_color/compressed/parameter_descriptions
-rgb/image_color/compressed/parameter_updates
-rgb/image_color/compressedDepth
-rgb/image_color/compressedDepth/parameter_descriptions
-rgb/image_color/compressedDepth/parameter_updates
-rgb/image_color/theora
-rgb/image_color/theora/parameter_descriptions
-rgb/image_color/theora/parameter_updates|
-|startDepth	|depth/camera_info
-depth/image_raw
-depth/image_raw_compressed
-depth/image_raw/compressed/parameter_descriptions
-depth/image_raw/compressed/parameter_updates
-depth/image_raw/compressedDepth
-depth/image_raw/compressedDepth/parameter_descriptions
-depth/image_raw/theora
-depth/image_raw/theora/parameter_descriptions
-depth/image_raw/theora/parameter_updates
-|
-|startIR	| ir/camera_info
-ir/image_ir
-ir/image_ir/compressed
-ir/image_ir/compressed/parameter_descriptions
-ir/image_ir/compressed/parameter_updates
-ir/image_ir/compressedDepth
-ir/image_ir/compressedDepth/parameter_descriptions
-ir/image_ir/compressedDepth/parameter_updates
-ir/image_ir/theora
-ir/image_ir/theora/parameter_descriptions
-ir/image_ir/theora/parameter_updates|
-|startAudio	|audio|
-|startBody	|bodyArray|
+
+*startRGB
+..-rgb/camera_info
+..-rgb/image_color
+..-rgb/image_color/compressed
+..-rgb/image_color/compressed/parameter_descriptions
+..-rgb/image_color/compressed/parameter_updates
+..-rgb/image_color/compressedDepth
+..-rgb/image_color/compressedDepth/parameter_descriptions
+..-rgb/image_color/compressedDepth/parameter_updates
+..-rgb/image_color/theora
+..-rgb/image_color/theora/parameter_descriptions
+..-rgb/image_color/theora/parameter_updates|
+*startDepth
+..-depth/camera_info
+..-depth/image_raw
+..-depth/image_raw_compressed
+..-depth/image_raw/compressed/parameter_descriptions
+..-depth/image_raw/compressed/parameter_updates
+..-depth/image_raw/compressedDepth
+..-depth/image_raw/compressedDepth/parameter_descriptions
+..-depth/image_raw/theora
+..-depth/image_raw/theora/parameter_descriptions
+..-depth/image_raw/theora/parameter_updates
+*startIR
+..-ir/camera_info
+..-ir/image_ir
+..-ir/image_ir/compressed
+..-ir/image_ir/compressed/parameter_descriptions
+..-ir/image_ir/compressed/parameter_updates
+..-ir/image_ir/compressedDepth
+..-ir/image_ir/compressedDepth/parameter_descriptions
+..-ir/image_ir/compressedDepth/parameter_updates
+..-ir/image_ir/theora
+..-ir/image_ir/theora/parameter_descriptions
+..-ir/image_ir/theora/parameter_updates
+*startAudio
+..-audio
+*startBody
+..-bodyArray
 
 
 
