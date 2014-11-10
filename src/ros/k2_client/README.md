@@ -70,6 +70,7 @@ On the Linux machine:
 ## Nodes
 The k2_client package contains 5 nodes, each of which exposes a number of different topics. All topics are prefixed by /head/kinect2.
 
+<<<<<<< HEAD
 * **startRGB**
   - rgb/camera_info
   - rgb/image_color
@@ -109,6 +110,47 @@ The k2_client package contains 5 nodes, each of which exposes a number of differ
   - audio
 * **startBody**
   - bodyArray
+=======
+*startRGB
+..-rgb/camera_info
+..-rgb/image_color
+..-rgb/image_color/compressed
+..-rgb/image_color/compressed/parameter_descriptions
+..-rgb/image_color/compressed/parameter_updates
+..-rgb/image_color/compressedDepth
+..-rgb/image_color/compressedDepth/parameter_descriptions
+..-rgb/image_color/compressedDepth/parameter_updates
+..-rgb/image_color/theora
+..-rgb/image_color/theora/parameter_descriptions
+..-rgb/image_color/theora/parameter_updates|
+*startDepth
+..-depth/camera_info
+..-depth/image_raw
+..-depth/image_raw_compressed
+..-depth/image_raw/compressed/parameter_descriptions
+..-depth/image_raw/compressed/parameter_updates
+..-depth/image_raw/compressedDepth
+..-depth/image_raw/compressedDepth/parameter_descriptions
+..-depth/image_raw/theora
+..-depth/image_raw/theora/parameter_descriptions
+..-depth/image_raw/theora/parameter_updates
+*startIR
+..-ir/camera_info
+..-ir/image_ir
+..-ir/image_ir/compressed
+..-ir/image_ir/compressed/parameter_descriptions
+..-ir/image_ir/compressed/parameter_updates
+..-ir/image_ir/compressedDepth
+..-ir/image_ir/compressedDepth/parameter_descriptions
+..-ir/image_ir/compressedDepth/parameter_updates
+..-ir/image_ir/theora
+..-ir/image_ir/theora/parameter_descriptions
+..-ir/image_ir/theora/parameter_updates
+*startAudio
+..-audio
+*startBody
+..-bodyArray
+>>>>>>> 5ec5d2d2ba4202ce2e4286a7a57f814d41677e32
 
 
 
