@@ -67,6 +67,7 @@ On the Linux machine:
 >> Make sure to set the IP address of the server machine by adding
 `<param name="serverNameOrIP" value="my-ip-address" />` to your launch file. <<
 
+
 ### Nodes
 The k2_client package contains 5 nodes, each of which exposes a number of different topics. All topics are prefixed by /head/kinect2.
 | Node        	| Topics            |
