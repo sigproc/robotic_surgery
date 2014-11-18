@@ -1,5 +1,17 @@
 <launch>
-  <node pkg="usb_cam" type="usb_cam_node" name="usb_cam" />
+  <node pkg="usb_cam" type="usb_cam_node" name="usb_cam">
+    <!-- The usb_cam node hard-codes contrast and saturation to "32". For our
+         cameras this is not a good value; the image appears washed out and
+         indistinct. Explicitly set mid-range values. -->
+    <param name="contrast" value="128" />
+    <param name="saturation" value="128" />
+
+    <!-- The usb_cam node sets the focus value to something silly. Explicitly
+         disable auto-focus and set focus to "0" (aka "at infinity"). -->
+    <param name="autofocus" value="false" />
+    <param name="focus" value="0" />
+
+  </node>
   <node pkg="image_view" type="image_view" name="image_view">
     <remap from="image" to="usb_cam/image_raw" />
   </node>
