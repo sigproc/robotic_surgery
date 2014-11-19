@@ -1,0 +1,25 @@
+<launch>
+  <!-- Launch the console so we can see node output -->
+  <node pkg="rqt_console" type="rqt_console" name="console" />
+
+  <!-- Launch the USB webcam node to provide camera images. -->
+  <node pkg="usb_cam" type="usb_cam_node" name="camera" />
+
+  <!-- View input camera image -->
+  <node pkg="image_view" type="image_view" name="input_image">
+    <remap from="image" to="camera/image_raw" />
+    <param name="window_name" value="Input video" />
+  </node>
+
+  <!-- Launch the face detector node proper -->
+  <node pkg="face_detection" type="face_detect.py" name="face_detect" />
+
+  <!-- Launch a node to draw boxes around the faces -->
+  <node pkg="face_detection" type="highlight_faces.py" name="face_images" />
+
+  <!-- View output image -->
+  <node pkg="image_view" type="image_view" name="output_image">
+    <remap from="image" to="face_images/image_raw" />
+    <param name="window_name" value="Detected faces" />
+  </node>
+</launch>

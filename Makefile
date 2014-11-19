@@ -10,6 +10,10 @@ WHOAMI ?= ${USER}
 # Docker binary
 DOCKER ?= docker
 
+# Addition arguments to docker build. (E.g. set --no-cache to invalidate the
+# current Docker cache if APT package information becomes outdated.)
+DOCKER_BUILD_OPTS ?=
+
 # What is a suitable name for the current git branch? Use it as the Docker tag.
 # If this is not a git repo, or there is no HEAD ref, use "latest" as a
 # fallback.
@@ -107,7 +111,7 @@ default: build
 
 .PHONY: image
 image:
-	$(DOCKER) build -t $(PROJECT_IMAGE) src
+	$(DOCKER) build -t $(PROJECT_IMAGE) $(DOCKER_BUILD_OPTS) src
 
 # We have to do this curious "double rule" here because the $(shell ...)
 # functions are evaluated at the *start* of the rule no matter where within the

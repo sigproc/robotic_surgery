@@ -1,5 +1,5 @@
 <launch>
-	<param name="serverNameOrIP" value="172.19.179.53" />
+	<param name="serverNameOrIP" value="windle" />
 		<group ns="/head/kinect2">
 		<node name="startRGB" pkg="k2_client" type="startRGB"/>
 		<node name="startDepth" pkg="k2_client" type="startDepth"/>
