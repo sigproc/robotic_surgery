@@ -48,7 +48,7 @@ For the robotic_surgery project these files are automatically installed inside t
 
 3. In the k2_client.launch launch file, edit the value of the `serverNameOrIP` parameter to the IP address of the server computer.
 
-4. Build the package using `rosmake`
+4. Build the workspace using `catkin_make`. Alternatively the package can be built independently using `rosmake`. 
 
 5. Run the package using 
 `roslaunch k2_client kinect2Client.launch` 
