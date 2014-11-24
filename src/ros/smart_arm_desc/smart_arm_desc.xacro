@@ -65,7 +65,7 @@
 
 	<!-- Shoulder tilt joint -->
         <joint name="shoulder_pitch_joint" type="revolute">
-            <origin xyz="${0.105 - 0.01 - 0.03085/2} 0 ${0.01 + 0.05 - 0.031/2}" rpy="0 0 0" />
+            <origin xyz="${0.079/1.414} 0 ${0.032 + 0.079/1.414}" rpy="0 0 0" />
             <parent link="arm_shoulder_pan_link"/>
             <child link="arm_shoulder_pitch_link" />
             
@@ -300,7 +300,7 @@
             <collision>
                 <origin xyz="0.0 0.0 0.0" rpy="0 0 0" />
                 <geometry>
-                    <mesh filename="package://smart_arm_description/meshes/collada/arm_left_finger.stl"/>
+                    <mesh filename="package://smart_arm_desc/meshes/arm_left_finger.stl"/>
                 </geometry>
             </collision>
         </link>
