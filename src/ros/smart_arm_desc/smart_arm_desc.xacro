@@ -53,7 +53,7 @@
         
         <!-- Shoulder pan joint -->
         <joint name="shoulder_pan_joint" type="revolute" >
-            <origin xyz="-0.0075 0 0.045" rpy="0 0 0" />
+            <origin xyz="-0.0075 0 0.025" rpy="0 0 0" />
             <parent link="arm_base_link" />
             <child link="arm_shoulder_pan_link"/>
             
@@ -65,7 +65,7 @@
 
 	<!-- Shoulder tilt joint -->
         <joint name="shoulder_pitch_joint" type="revolute">
-            <origin xyz="${0.079/1.414} 0 ${0.032 + 0.079/1.414}" rpy="0 0 0" />
+            <origin xyz="${0.077/1.414} 0 ${0.040 + 0.077/1.414}" rpy="0 0 0" />
             <parent link="arm_shoulder_pan_link"/>
             <child link="arm_shoulder_pitch_link" />
             
@@ -101,32 +101,56 @@
             <safety_controller k_position="100" k_velocity="15.0" soft_lower_limit="${-2.6179939+0.1}" soft_upper_limit="${2.6179939-0.1}" />
         </joint>
         
-        <!-- Gripper right finger joint -->
-        <joint name="right_finger_joint" type="revolute">
-            <origin xyz="${0.0015 + 0.05 - 0.01} ${-0.035/2} 0" rpy="0 0 0" />
+        <!-- Right knuckle joint -->
+        <joint name="right_knuckle_joint" type="revolute">
+            <origin xyz="0.025 ${0.0125-0.014*2} -0.010" rpy="0 0 -1.5708" />
             <parent link="arm_wrist_roll_link"/>
             <child link="arm_right_finger_link" />
             
             <axis xyz="0 0 1"/>
-            <!-- From 14 to -45 degrees -->
-            <limit  lower="-0.838576116" upper="0.245436912" effort="300" velocity="1.17" />
+            <!-- From -15 to 55 degrees -->
+            <limit  lower="-0.2618" upper="0.9599" effort="300" velocity="1.17" />
             <dynamics damping="50" friction="1"/>
-            <safety_controller k_position="100" k_velocity="15.0" soft_lower_limit="${-0.838576116+0.1}" soft_upper_limit="${0.245436912-0.1}" />
         </joint>
         
-        <!-- Gripper left finger joint -->
-        <joint name="left_finger_joint" type="revolute">
-            <origin xyz="${0.0015 + 0.05 - 0.01} ${0.035/2} 0" rpy="0 0 0" />
+        <!-- Left knuckle joint -->
+        <joint name="left_knuckle_joint" type="revolute">
+            <origin xyz="0.025 0.0125 -0.010" rpy="0 0 1.5708" />
             <parent link="arm_wrist_roll_link"/>
             <child link="arm_left_finger_link" />
             
+	    <mimic joint="right_knuckle_joint" multiplier="-1"/>
             <axis xyz="0 0 1"/>
             <!-- From -14 to 45 degrees -->
-            <limit  lower="-0.240323643" upper="0.843689385" effort="300" velocity="1.17" />
+            <limit  lower="-0.9599" upper="0.2618" effort="300" velocity="1.17" />
             <dynamics damping="50" friction="1"/>
-            <safety_controller k_position="100" k_velocity="15.0" soft_lower_limit="${-0.240323643+0.1}" soft_upper_limit="${0.843689385-0.1}" />
         </joint>
 
+	<!-- Right finger joint -->
+        <joint name="right_finger_joint" type="revolute">
+            <origin xyz="0.052 0 0.003" rpy="0 0 1.5708" />
+            <parent link="arm_right_finger_link"/>
+            <child link="arm_right_gripper_link" />
+            
+            <axis xyz="0 0 1"/>
+	    <mimic joint="right_knuckle_joint" multiplier="-1"/>
+            <!-- From -15 to 55 degrees -->
+            <limit  lower="-3.14" upper="3.14" effort="300" velocity="1.17" />
+            <dynamics damping="50" friction="1"/>
+        </joint>
+
+	<!-- Left finger joint -->
+        <joint name="left_finger_joint" type="revolute">
+            <origin xyz="0.052 0 0.003" rpy="0 0 -1.5708" />
+            <parent link="arm_left_finger_link"/>
+            <child link="arm_left_gripper_link" />
+            
+            <axis xyz="0 0 1"/>
+	    <mimic joint="right_knuckle_joint" multiplier="1"/>
+            <!-- From -15 to 55 degrees -->
+            <limit  lower="-3.14" upper="3.14" effort="300" velocity="1.17" />
+            <dynamics damping="50" friction="1"/>
+        </joint>
         <!-- ****** LINK DEFINITIONS ****** -->
         
         <link name="arm_base_link">
@@ -143,7 +167,7 @@
                 <geometry>
                     <mesh filename="package://smart_arm_desc/meshes/arm_base.stl"/>
                 </geometry>
-                <material name="Black" />
+                <material name="matArm" />
             </visual>
             
             <collision>
@@ -164,15 +188,15 @@
             </inertial>
             
             <visual>
-                <origin xyz="0 0 0.0" rpy="0 0 0" />
+                <origin xyz="-0.0565 -0.0565 0" rpy="0 0 0" />
                 <geometry>
                     <mesh filename="package://smart_arm_desc/meshes/arm_shoulder_pan.stl"/>
                 </geometry>
-                <material name="Black" />
+                <material name="matArm" />
             </visual>
             
             <collision>
-                <origin xyz="0 0 0.0" rpy="0 0 0" />
+                <origin xyz="0.0565 0.0565 0" rpy="0 0 0" />
                 <geometry>
                     <mesh filename="package://smart_arm_desc/meshes/arm_shoulder_pan.stl"/>
                 </geometry>
@@ -193,7 +217,7 @@
                 <geometry>
                     <mesh filename="package://smart_arm_desc/meshes/arm_shoulder_pitch.stl"/>
                 </geometry>
-                <material name="Black" />
+                <material name="matArm" />
             </visual>
             
             <collision>
@@ -218,7 +242,7 @@
                 <geometry>
                     <mesh filename="package://smart_arm_desc/meshes/arm_elbow_flex.stl"/>
                 </geometry>
-                <material name="Black" />
+                <material name="matArm" />
             </visual>
             
             <collision>
@@ -239,17 +263,17 @@
             </inertial>
             
             <visual>
-                <origin xyz="0.0 0.0 0.0" rpy="0 0 0" />
+                <origin xyz="0.0 -0.0615 -0.042" rpy="0 0 0" />
                 <geometry>
-                    <mesh filename="package://smart_arm_desc/meshes/arm_wrist_roll.stl"/>
+                    <mesh filename="package://smart_arm_desc/meshes/arm_wrist.stl"/>
                 </geometry>
-                <material name="Black" />
+                <material name="matArm" />
             </visual>
             
             <collision>
-                <origin xyz="0.0 0.0 0.0" rpy="0 0 0" />
+                <origin xyz="0.0 -0.0615 -0.042" rpy="0 0 0" />
                 <geometry>
-                    <mesh filename="package://smart_arm_desc/meshes/arm_wrist_roll.stl"/>
+                    <mesh filename="package://smart_arm_desc/meshes/arm_wrist.stl"/>
                 </geometry>
             </collision>
         </link>
@@ -264,17 +288,17 @@
             </inertial>
             
             <visual>
-                <origin xyz="0.0 0.0 0.0" rpy="0 0 0" />
+                <origin xyz="-0.014 -0.014 0.0" rpy="0 0 0" />
                 <geometry>
-                    <mesh filename="package://smart_arm_desc/meshes/arm_right_finger.stl"/>
+                    <mesh filename="package://smart_arm_desc/meshes/arm_finger_link.stl"/>
                 </geometry>
-                <material name="Black" />
+                <material name="matArm" />
             </visual>
             
             <collision>
-                <origin xyz="0.0 0.0 0.0" rpy="0 0 0" />
+                <origin xyz="-0.014 -0.014 0.0" rpy="0 0 0" />
                 <geometry>
-                    <mesh filename="package://smart_arm_desc/meshes/arm_right_finger.stl"/>
+                    <mesh filename="package://smart_arm_desc/meshes/arm_finger_link.stl"/>
                 </geometry>
             </collision>
         </link>
@@ -283,27 +307,78 @@
         <link name="arm_left_finger_link">
             <inertial>
                 <mass value="0.0225" />
-                <origin xyz="0.03058625 0.01804371 -0.00941599" rpy="0 0 0" />
+                <origin xyz="-0.014 -0.014 0.0" rpy="0 0 0" />
                 <inertia ixx="1.0" ixy="0.0" ixz="0.0"
                          iyy="1.0" iyz="0.0" 
                          izz="1.0" />
             </inertial>
             
             <visual>
-                <origin xyz="0.0 0.0 0.0" rpy="0 0 0" />
+                <origin xyz="-0.014 -0.014 0.0" rpy="0 0 0" />
                 <geometry>
-                    <mesh filename="package://smart_arm_desc/meshes/arm_left_finger.stl"/>
+                    <mesh filename="package://smart_arm_desc/meshes/arm_finger_link.stl"/>
                 </geometry>
-                <material name="Black" />
+                <material name="matArm" />
             </visual>
             
             <collision>
-                <origin xyz="0.0 0.0 0.0" rpy="0 0 0" />
+                <origin xyz="-0.014 -0.014 0.0" rpy="0 0 0" />
                 <geometry>
-                    <mesh filename="package://smart_arm_desc/meshes/arm_left_finger.stl"/>
+                    <mesh filename="package://smart_arm_desc/meshes/arm_finger_link.stl"/>
                 </geometry>
             </collision>
         </link>
+
+	<link name="arm_right_gripper_link">
+            <inertial>
+                <mass value="0.0225" />
+                <origin xyz="${-0.01*0.5-0.004*0.866} ${-0.005*0.866-0.004*0.5} -0.014" rpy="0 0 0" />
+                <inertia ixx="1.0" ixy="0.0" ixz="0.0"
+                         iyy="1.0" iyz="0.0" 
+                         izz="1.0" />
+            </inertial>
+            
+            <visual>
+                <origin xyz="${-0.01*0.5-0.004*0.866} ${-0.005*0.866-0.004*0.5} -0.014" rpy="0 0 0" />
+                <geometry>
+                    <mesh filename="package://smart_arm_desc/meshes/arm_gripper.stl"/>
+                </geometry>
+                <material name="matArm" />
+            </visual>
+            
+            <collision>
+                <origin xyz="${-0.01*0.5-0.004*0.866} ${-0.005*0.866-0.004*0.5} -0.014" rpy="0 0 0" />
+                <geometry>
+                    <mesh filename="package://smart_arm_desc/meshes/arm_gripper.stl"/>
+                </geometry>
+            </collision>
+        </link>
+
+<link name="arm_left_gripper_link">
+            <inertial>
+                <mass value="0.0225" />
+                <origin xyz="${-0.01*0.5-0.004*0.866} ${-0.005*0.866-0.004*0.5} 0.014" rpy="3.1415 0 0" />
+                <inertia ixx="1.0" ixy="0.0" ixz="0.0"
+                         iyy="1.0" iyz="0.0" 
+                         izz="1.0" />
+            </inertial>
+            
+            <visual>
+                <origin xyz="${-0.01*0.5-0.004*0.866} ${0.005*0.866+0.004*0.5} 0.014" rpy="3.1415 0 0" />
+                <geometry>
+                    <mesh filename="package://smart_arm_desc/meshes/arm_gripper.stl"/>
+                </geometry>
+                <material name="matArm" />
+            </visual>
+            
+            <collision>
+                <origin xyz="${-0.01*0.5-0.004*0.866} ${0.005*0.866+0.004*0.5} 0.014" rpy="3.1415 0 0" />
+                <geometry>
+                    <mesh filename="package://smart_arm_desc/meshes/arm_gripper.stl"/>
+                </geometry>
+            </collision>
+        </link>
+
         <!-- ****** TRANSMISSION DEFINITIONS ****** -->
         <transmission type="pr2_mechanism_model/SimpleTransmission" name="shoulder_pan_trans">
             <actuator name="shoulder_pan_motor" />
@@ -331,20 +406,14 @@
         
         <transmission type="pr2_mechanism_model/SimpleTransmission" name="right_finger_trans">
             <actuator name="right_finger_motor" />
-            <joint name="right_finger_joint" />
-            <mechanicalReduction>1.0</mechanicalReduction>
-        </transmission>
-        
-        <transmission type="pr2_mechanism_model/SimpleTransmission" name="left_finger_trans">
-            <actuator name="left_finger_motor" />
-            <joint name="left_finger_joint" />
+            <joint name="right_knuckle_joint" />
             <mechanicalReduction>1.0</mechanicalReduction>
         </transmission>
         
         <!-- ****** MATERIAL DEFINITIONS ****** -->
         
-       	<material name="Black">
-        	<color rgba="0.2 0.2 0.2 1.0"/>
+       	<material name="matArm">
+        	<color rgba="0.8 0.8 0.8 1.0"/>
     	</material>
     </macro>
 </robot>
