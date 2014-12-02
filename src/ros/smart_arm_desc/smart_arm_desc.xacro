@@ -151,6 +151,20 @@
             <limit  lower="-3.14" upper="3.14" effort="300" velocity="1.17" />
             <dynamics damping="50" friction="1"/>
         </joint>
+
+	<!-- Right connector joint -->
+        <joint name="right_connector_joint" type="revolute">
+            <origin xyz="0.059 -0.005 -0.010" rpy="0 0 1.5708" />
+            <parent link="arm_wrist_roll_link"/>
+            <child link="arm_right_connector_link" />
+            
+	    <mimic joint="claw_joint" multiplier="-1"/>
+            <axis xyz="0 0 1"/>
+            <!-- From -14 to 45 degrees -->
+            <limit  lower="-0.9599" upper="0.2618" effort="300" velocity="1.17" />
+            <dynamics damping="50" friction="1"/>
+        </joint>
+
         <!-- ****** LINK DEFINITIONS ****** -->
         
         <link name="arm_base_link">
@@ -332,14 +346,14 @@
 	<link name="arm_right_gripper_link">
             <inertial>
                 <mass value="0.0225" />
-                <origin xyz="${-0.01*0.5-0.004*0.866} ${-0.005*0.866-0.004*0.5} -0.014" rpy="0 0 0" />
+                <origin xyz="${-0.01*0.5-0.004*0.866} ${-0.005*0.866-0.004*0.5} -0.014" rpy="0 0 0.139" />
                 <inertia ixx="1.0" ixy="0.0" ixz="0.0"
                          iyy="1.0" iyz="0.0" 
                          izz="1.0" />
             </inertial>
             
             <visual>
-                <origin xyz="${-0.01*0.5-0.004*0.866} ${-0.005*0.866-0.004*0.5} -0.014" rpy="0 0 0" />
+                <origin xyz="${-0.01*0.5-0.004*0.866} ${-0.005*0.866-0.004*0.5} -0.014" rpy="0 0 0.139" />
                 <geometry>
                     <mesh filename="package://smart_arm_desc/meshes/arm_gripper.stl"/>
                 </geometry>
@@ -347,7 +361,7 @@
             </visual>
             
             <collision>
-                <origin xyz="${-0.01*0.5-0.004*0.866} ${-0.005*0.866-0.004*0.5} -0.014" rpy="0 0 0" />
+                <origin xyz="${-0.01*0.5-0.004*0.866} ${-0.005*0.866-0.004*0.5} -0.014" rpy="0 0 0.139" />
                 <geometry>
                     <mesh filename="package://smart_arm_desc/meshes/arm_gripper.stl"/>
                 </geometry>
@@ -357,14 +371,14 @@
 <link name="arm_left_gripper_link">
             <inertial>
                 <mass value="0.0225" />
-                <origin xyz="${-0.01*0.5-0.004*0.866} ${-0.005*0.866-0.004*0.5} 0.014" rpy="3.1415 0 0" />
+                <origin xyz="${-0.01*0.5-0.004*0.866} ${-0.005*0.866-0.004*0.5} 0.014" rpy="3.1415 -0 0.139" />
                 <inertia ixx="1.0" ixy="0.0" ixz="0.0"
                          iyy="1.0" iyz="0.0" 
                          izz="1.0" />
             </inertial>
             
             <visual>
-                <origin xyz="${-0.01*0.5-0.004*0.866} ${0.005*0.866+0.004*0.5} 0.014" rpy="3.1415 0 0" />
+                <origin xyz="${-0.01*0.5-0.004*0.866} ${0.005*0.866+0.004*0.5} 0.014" rpy="3.1415 0 -0.139" />
                 <geometry>
                     <mesh filename="package://smart_arm_desc/meshes/arm_gripper.stl"/>
                 </geometry>
@@ -372,9 +386,34 @@
             </visual>
             
             <collision>
-                <origin xyz="${-0.01*0.5-0.004*0.866} ${0.005*0.866+0.004*0.5} 0.014" rpy="3.1415 0 0" />
+                <origin xyz="${-0.01*0.5-0.004*0.866} ${0.005*0.866+0.004*0.5} 0.014" rpy="3.1415 0 -0.139" />
                 <geometry>
                     <mesh filename="package://smart_arm_desc/meshes/arm_gripper.stl"/>
+                </geometry>
+            </collision>
+        </link>
+
+<link name="arm_right_connector_link">
+            <inertial>
+                <mass value="0.0225" />
+                <origin xyz="${-0.01*0.5-0.004*0.866} ${-0.005*0.866-0.004*0.5} 0.014" rpy="0 0 0" />
+                <inertia ixx="1.0" ixy="0.0" ixz="0.0"
+                         iyy="1.0" iyz="0.0" 
+                         izz="1.0" />
+            </inertial>
+            
+            <visual>
+                <origin xyz="-0.005 -0.005 0" rpy="0 0 0" />
+                <geometry>
+                    <mesh filename="package://smart_arm_desc/meshes/arm_connector.stl"/>
+                </geometry>
+                <material name="matArm" />
+            </visual>
+            
+            <collision>
+                <origin xyz="0.005 0.005 0" rpy="0 0 0" />
+                <geometry>
+                    <mesh filename="package://smart_arm_desc/meshes/arm_connector.stl"/>
                 </geometry>
             </collision>
         </link>
@@ -413,7 +452,7 @@
         <!-- ****** MATERIAL DEFINITIONS ****** -->
         
        	<material name="matArm">
-        	<color rgba="0.8 0.8 0.8 1.0"/>
+        	<color rgba="0.2 0.2 0.2 1.0"/>
     	</material>
     </macro>
 </robot>
