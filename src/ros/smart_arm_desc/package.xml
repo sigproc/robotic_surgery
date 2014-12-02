@@ -1,0 +1,18 @@
+<package>
+  <name>smart_arm_desc</name>
+  <version>0.1.0</version>
+  <description>
+    3D Meshes and URDF description for the CrustCrawler Smart Robotic Arm.
+  </description>
+  <author>Arizona Robotics Research Group, University of Arizona</author>
+  <author>Antons Rebguns</author>
+  <maintainer email="rjw57@cam.ac.uk">Rich Wareham</maintainer>
+  <license>BSD</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <export>
+    <gazebo gazebo_media_path="${prefix}" />
+  </export>
+</package>
+
