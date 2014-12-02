@@ -102,7 +102,7 @@
         </joint>
         
         <!-- Right knuckle joint -->
-        <joint name="right_knuckle_joint" type="revolute">
+        <joint name="claw_joint" type="revolute">
             <origin xyz="0.025 ${0.0125-0.014*2} -0.010" rpy="0 0 -1.5708" />
             <parent link="arm_wrist_roll_link"/>
             <child link="arm_right_finger_link" />
@@ -119,7 +119,7 @@
             <parent link="arm_wrist_roll_link"/>
             <child link="arm_left_finger_link" />
             
-	    <mimic joint="right_knuckle_joint" multiplier="-1"/>
+	    <mimic joint="claw_joint" multiplier="-1"/>
             <axis xyz="0 0 1"/>
             <!-- From -14 to 45 degrees -->
             <limit  lower="-0.9599" upper="0.2618" effort="300" velocity="1.17" />
@@ -133,7 +133,7 @@
             <child link="arm_right_gripper_link" />
             
             <axis xyz="0 0 1"/>
-	    <mimic joint="right_knuckle_joint" multiplier="-1"/>
+	    <mimic joint="claw_joint" multiplier="-1"/>
             <!-- From -15 to 55 degrees -->
             <limit  lower="-3.14" upper="3.14" effort="300" velocity="1.17" />
             <dynamics damping="50" friction="1"/>
@@ -146,7 +146,7 @@
             <child link="arm_left_gripper_link" />
             
             <axis xyz="0 0 1"/>
-	    <mimic joint="right_knuckle_joint" multiplier="1"/>
+	    <mimic joint="claw_joint" multiplier="1"/>
             <!-- From -15 to 55 degrees -->
             <limit  lower="-3.14" upper="3.14" effort="300" velocity="1.17" />
             <dynamics damping="50" friction="1"/>
@@ -406,7 +406,7 @@
         
         <transmission type="pr2_mechanism_model/SimpleTransmission" name="right_finger_trans">
             <actuator name="right_finger_motor" />
-            <joint name="right_knuckle_joint" />
+            <joint name="claw_joint" />
             <mechanicalReduction>1.0</mechanicalReduction>
         </transmission>
         
