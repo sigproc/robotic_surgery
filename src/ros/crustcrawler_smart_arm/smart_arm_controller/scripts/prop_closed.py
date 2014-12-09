@@ -41,6 +41,8 @@ if __name__ == '__main__':
     pubs = [rospy.Publisher(name + '/command', Float64) for name in joint_names]
     rospy.init_node('make_goal_pose', anonymous=True)
     
+    rospy.sleep(5)
+    
     #Control the robot to the goal position
     r = rospy.Rate(10)
     idx = 0
@@ -49,7 +51,7 @@ if __name__ == '__main__':
     
     pose=current_pose
     
-    rospy.Timer(rospy.Duration(3), listen_callback)
+    #rospy.Timer(rospy.Duration(3), listen_callback)
     
     while not rospy.is_shutdown():
 
@@ -68,6 +70,8 @@ if __name__ == '__main__':
                 pubs[i].publish(joint_commands_smooth[0,i])
                 
             pose = joint_commands_smooth
+            
+            rospy.logerr(pose)
 
             r.sleep()
 
