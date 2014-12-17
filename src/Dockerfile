@@ -24,6 +24,9 @@ RUN add-apt-repository ppa:openrave/release
 # Make sure package sources are up to date
 RUN apt-get -y update
 
+# Upgrade any installed packages
+RUN apt-get -y upgrade
+
 # Install additional packages
 RUN apt-get -y install ros-hydro-moveit-full \
     ros-hydro-dynamixel-motor ros-hydro-dynamixel-controllers \
