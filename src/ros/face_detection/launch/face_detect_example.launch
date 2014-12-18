@@ -3,7 +3,13 @@
   <node pkg="rqt_console" type="rqt_console" name="console" />
 
   <!-- Launch the USB webcam node to provide camera images. -->
-  <node pkg="usb_cam" type="usb_cam_node" name="camera" />
+  <node pkg="usb_cam" type="usb_cam_node" name="camera" >
+    <param name="video_device" value="/dev/video0" />
+    <param name="contrast" value="128" />
+    <param name="saturation" value="128" />
+    <param name="autofocus" value="false" />
+    <param name="focus" value="0" />
+  </node>
 
   <!-- View input camera image -->
   <node pkg="image_view" type="image_view" name="input_image">
