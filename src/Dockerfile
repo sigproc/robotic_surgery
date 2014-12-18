@@ -38,9 +38,11 @@ RUN apt-get -y install gtk2-engines gtk2-engines-pixbuf
 RUN apt-get -y install x11vnc
 RUN apt-get -y install xserver-xorg-video-dummy xserver-xorg-input-void
 RUN apt-get -y install xvfb
+RUN apt-get -y install python-numpy python-scipy
 
 # USB webcam support
 RUN apt-get -y install ros-hydro-usb-cam
+RUN apt-get -y install cheese
 
 # Install OpenCV libraries and the Python bindings
 RUN apt-get -y install libopencv-dev python-opencv
