@@ -1,0 +1,13 @@
+<launch>
+  <include file="$(find arm_moveit_generated)/launch/planning_context.launch">
+    <arg name="load_robot_description" value="true"/>
+  </include>
+
+  <node name="kinematic_model_tutorial"
+        pkg="arm_moveit_generated"
+        type="kinematic_model_tutorial"
+        respawn="false" output="screen">
+    <rosparam command="load"
+              file="$(find arm_moveit_generated)/config/kinematics.yaml"/>
+  </node>
+</launch>
