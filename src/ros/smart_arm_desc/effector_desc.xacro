@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+
+<robot name="smart_arm" xmlns:sensor="http://playerstage.sourceforge.net/gazebo/xmlschema/#sensor"
+    xmlns:controller="http://playerstage.sourceforge.net/gazebo/xmlschema/#controller"
+    xmlns:interface="http://playerstage.sourceforge.net/gazebo/xmlschema/#interface">
+
+<macro name="end_effector" params="parent">
+
+
+  <joint name="effector_base_joint" type="fixed">
+    <parent link="${parent}"/>
+    <child link="effector_link"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+
+
+  <link name="effector_link">
+    <visual>
+      <geometry>
+        <cylinder length="0.165" radius="0.005"/>
+      </geometry>
+      <origin xyz="0.0825 0 0" rpy="0 1.57075 0"/>
+    </visual>
+  </link>
+
+<joint name="effector_tip_joint" type="fixed">
+    <parent link="effector_link"/>
+    <child link="effector_tip_link"/>
+    <origin xyz="0.165 0 0" rpy="0 0 0"/>
+  </joint>
+
+<link name = "effector_tip_link">
+</link>
+</macro>
+</robot>

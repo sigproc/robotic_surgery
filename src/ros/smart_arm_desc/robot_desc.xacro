@@ -7,11 +7,13 @@
     
     <!-- Included URDF Files -->
     <include filename="$(find smart_arm_desc)/smart_arm_desc.xacro" />
-    
+    <include filename="$(find smart_arm_desc)/effector_desc.xacro" />
+
     <link name="world_link">
     </link>
     
     <smart_arm parent="world_link">
         <origin xyz="0 0 0" rpy="0 0 0" />
     </smart_arm>
+    <end_effector parent="arm_wrist_roll_link"/>
 </robot>
