@@ -99,24 +99,24 @@ class PointDetectionNode(object):
         
         # Detect points
         detect_point = PointDetector
-        points = detect_point(imageArray)
+        points = detect_point(image_array)
 
-        # Create a point bounding box for each point
-        #for point_idx, point_bbox in enumerate(points):
-        #    rospy.logdebug('Point #%s at %s', point_idx+1, point_bbox)
+        # Create a point bounding circle for each point
+        for point_idx, point_circle in enumerate(points):
+            rospy.logdebug('Point #%s at %s', point_idx+1, point_circle)
 
             # Create point message
-        point_msg = Point()
-        point_msg.header = points_msg.header
+            point_msg = Point()
+            point_msg.header = points_msg.header
 
             # Initialise roi
-	if points != (0,0):
-            point_msg.roi.x_offset = points[0]
-            point_msg.roi.y_offset = points[1]
-            point_msg.roi.do_rectify = False
+	    if points != (0,0):
+                point_msg.roi.x_offset = point_circle[0]
+                point_msg.roi.y_offset = point_circle[1]
+                point_msg.roi.do_rectify = False
 
             # Append to list of points
-        points_msg.points.append(point_msg)
+            points_msg.points.append(point_msg)
 
         # Publish points messages
         self._points_pub.publish(points_msg)
