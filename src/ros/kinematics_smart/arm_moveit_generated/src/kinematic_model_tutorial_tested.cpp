@@ -10,7 +10,6 @@ void print_kinematic_state(robot_state::RobotStatePtr kinematic_state, const rob
 
     // Get Joint Values
     std::vector<double> joint_values;
-
     kinematic_state->copyJointGroupPositions(joint_model_group, joint_values);
     
     for(std::size_t i = 0; i < joint_names.size(); ++i)
@@ -35,7 +34,6 @@ int main(int argc, char **argv)
     const robot_state::JointModelGroup* joint_model_group = kinematic_model->getJointModelGroup("Arm");
 
     print_kinematic_state(kinematic_state, joint_model_group);
-
     
     /* Check whether any joint is outside its joint limits */
     ROS_INFO_STREAM("Current state is " << (kinematic_state->satisfiesBounds() ? "valid" : "not valid"));
@@ -44,12 +42,8 @@ int main(int argc, char **argv)
     kinematic_state->enforceBounds();
     ROS_INFO_STREAM("Current state is " << (kinematic_state->satisfiesBounds() ? "valid" : "not valid"));
     
-    Eigen::VectorXd joints(6);
-    joints << 0, 1.9722, -1.9722, 0, 0, 0;
-
     //Forward Kinematics
-    //kinematic_state->setToRandomPositions(joint_model_group);
-    kinematic_state->setJointGroupPositions(joint_model_group, joints);
+    kinematic_state->setToRandomPositions(joint_model_group);
     Eigen::Affine3d end_effector_state;
     end_effector_state = kinematic_state->getGlobalLinkTransform("effector_tip_link");
     
@@ -63,16 +57,16 @@ int main(int argc, char **argv)
     r << -1, 0, 0,
                                     0, 0, -1,
                                     0, 1, 0;
-    /*double rotation_matrix[3][3] = {
+    double rotation_matrix[3][3] = {
                                     {0.56, 0.26, 0.564},
                                     {0.76, 0.12, 0.134},
                                     {0.62, 0.77, 0.23}
                                     };
                       
-    double translation_vector = {0.1, 0, 0};*/
+    /*double translation_vector = {0.1, 0, 0};*/
     
     Eigen::Vector3d v;
-    v << 0, 0, 0;
+    v << 0.01, 0, 0;
     
     /*end_effector_state.rotate(r);*/
     
