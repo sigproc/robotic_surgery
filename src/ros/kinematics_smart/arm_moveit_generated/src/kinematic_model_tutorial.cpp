@@ -4,6 +4,21 @@
 #include <moveit/robot_model/robot_model.h>
 #include <moveit/robot_state/robot_state.h>
 
+void print_kinematic_state(robot_state::RobotStatePtr kinematic_state, const robot_state::JointModelGroup* joint_model_group) {
+    // Get joint names
+    const std::vector<std::string> &joint_names = joint_model_group->getJointModelNames();
+
+    // Get Joint Values
+    std::vector<double> joint_values;
+
+    kinematic_state->copyJointGroupPositions(joint_model_group, joint_values);
+    
+    for(std::size_t i = 0; i < joint_names.size(); ++i)
+    {
+        ROS_INFO("Joint %s: %f", joint_names[i].c_str(), joint_values[i]);
+    }
+}
+
 int main(int argc, char **argv)
 {
     ros::init (argc, argv, "arm_kinematics");
@@ -19,21 +34,9 @@ int main(int argc, char **argv)
     kinematic_state->setToDefaultValues();
     const robot_state::JointModelGroup* joint_model_group = kinematic_model->getJointModelGroup("Arm");
 
-    const std::vector<std::string> &joint_names = joint_model_group->getJointModelNames();
+    print_kinematic_state(kinematic_state, joint_model_group);
 
-    //Get Joint Values
-    std::vector<double> joint_values;
-    kinematic_state->copyJointGroupPositions(joint_model_group, joint_values);
-    for(std::size_t i = 0; i < joint_names.size(); ++i)
-    {
-        ROS_INFO("Joint %s: %f", joint_names[i].c_str(), joint_values[i]);
-    }
     
-    //Joint Limits
-    /* Set one joint in the right arm outside its joint limit */
-    joint_values[0] = 1.57;
-    kinematic_state->setJointGroupPositions(joint_model_group, joint_values);
-
     /* Check whether any joint is outside its joint limits */
     ROS_INFO_STREAM("Current state is " << (kinematic_state->satisfiesBounds() ? "valid" : "not valid"));
 
@@ -41,10 +44,40 @@ int main(int argc, char **argv)
     kinematic_state->enforceBounds();
     ROS_INFO_STREAM("Current state is " << (kinematic_state->satisfiesBounds() ? "valid" : "not valid"));
     
-    //Forward Kinematics
-    kinematic_state->setToRandomPositions(joint_model_group);
-    const Eigen::Affine3d &end_effector_state = kinematic_state->getGlobalLinkTransform("effector_tip_link");
+    Eigen::VectorXd joints(6);
+    joints << 0, 1.9722, -1.9722, 0, 0, 0;
 
+    //Forward Kinematics
+    //kinematic_state->setToRandomPositions(joint_model_group);
+    kinematic_state->setJointGroupPositions(joint_model_group, joints);
+    Eigen::Affine3d end_effector_state;
+    end_effector_state = kinematic_state->getGlobalLinkTransform("effector_tip_link");
+    
+    print_kinematic_state(kinematic_state, joint_model_group);
+    
+    /* Print end-effector pose. Remember that this is in the model frame */
+    ROS_INFO_STREAM("Translation: " << end_effector_state.translation());
+    ROS_INFO_STREAM("Rotation: " << end_effector_state.rotation());
+    
+    Eigen::Matrix3d r;
+    r << -1, 0, 0,
+                                    0, 0, -1,
+                                    0, 1, 0;
+    /*double rotation_matrix[3][3] = {
+                                    {0.56, 0.26, 0.564},
+                                    {0.76, 0.12, 0.134},
+                                    {0.62, 0.77, 0.23}
+                                    };
+                      
+    double translation_vector = {0.1, 0, 0};*/
+    
+    Eigen::Vector3d v;
+    v << 0, 0, 0;
+    
+    /*end_effector_state.rotate(r);*/
+    
+    end_effector_state.translate(v);
+    
     /* Print end-effector pose. Remember that this is in the model frame */
     ROS_INFO_STREAM("Translation: " << end_effector_state.translation());
     ROS_INFO_STREAM("Rotation: " << end_effector_state.rotation());
@@ -54,11 +87,7 @@ int main(int argc, char **argv)
 
     if (found_ik)
     {
-        kinematic_state->copyJointGroupPositions(joint_model_group, joint_values);
-        for(std::size_t i=0; i < joint_names.size(); ++i)
-        {
-            ROS_INFO("Joint %s: %f", joint_names[i].c_str(), joint_values[i]);
-        }
+        print_kinematic_state(kinematic_state, joint_model_group);
     }
     else
     {
