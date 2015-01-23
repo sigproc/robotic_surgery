@@ -147,8 +147,12 @@ def TipDetector(I):
     if not E or not E1:
         D=[0,0]
     else:
-	C1=arrangeToList(E1)
-	C=arrangeToList(E)
+	ind1 = np.lexsort((E1[1],E1[0]))
+	C1=[(E1[1][i],E1[0][i]) for i in ind1]
+	ind = np.lexsort((E[1],E[0]))
+	C=[(E[1][i],E[0][i]) for i in ind]
+	#C1=arrangeToList(E1)
+	#C=arrangeToList(E)
 	for i in range(1,np.shape(C1)[0]):
 	    for j in range(1,np.shape(C)[0]):
 		if abs(C1[i][0]-C[j][0])<20 and abs(C1[i][1]-C[j][1])<20:
