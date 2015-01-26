@@ -32,6 +32,10 @@ target_link_libraries(kinematic_model_tutorial ${catkin_LIBRARIES} ${Boost_LIBRA
 add_executable(ros_api_tutorial src/ros_api_tutorial.cpp)
 target_link_libraries(ros_api_tutorial ${catkin_LIBRARIES} ${Boost_LIBRARIES})
 
+add_executable(motion_planning_api_tutorial src/motion_planning_api_tutorial.cpp)
+target_link_libraries(motion_planning_api_tutorial ${catkin_LIBRARIES} ${Boost_LIBRARIES})
+install(TARGETS motion_planning_api_tutorial DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+
 install(TARGETS kinematic_model_tutorial ros_api_tutorial DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 install(DIRECTORY launch DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
 install(FILES plugins.xml DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
