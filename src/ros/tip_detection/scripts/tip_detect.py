@@ -91,8 +91,6 @@ class TipDetectionNode(object):
 
         # Parse image message into numpy array
         image_array = image_to_array(image)
-        rospy.logdebug('Successfully parsed new image with shape: %s',
-            image_array.shape)
         imageArray = reduce_size(image_array,'rgb',2);
 	#imageArray = reduce_size(imageArray,'rgb',2);
 	#imageArray = reduce_size(imageArray,'rgb',2);

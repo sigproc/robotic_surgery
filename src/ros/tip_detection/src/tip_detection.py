@@ -87,6 +87,25 @@ def array_to_image(array):
 
     return image_msg
 
+def count(a):
+    results = []
+    count = []
+    final=[]
+    for x in a:
+        if x not in results and x!=(0,0):
+            results.append(x)
+            count.append(0)
+    for x in a:
+        for i in range(0,len(results)):
+            if x==results[i]:
+                count[i]+=1
+    for i in range(0,len(results)):
+	count[i]=max(count)
+	final.append(results[i])
+    for i in range(0,len(results)):
+        if count[i]==max(count):
+            final.append(results[i])	
+    return max(final)
 
 def TipDetector(I):
     # Detect tips in an image
@@ -124,9 +143,9 @@ def TipDetector(I):
 
     gray1 = cv2.cvtColor(I,cv2.COLOR_BGR2GRAY)
     gray1 = np.float32(gray1)
-    dst1 = cv2.cornerHarris(gray1,5,3,0.04)
+    dst1 = cv2.cornerHarris(gray1,3,3,0.04)
     dst1 = cv2.dilate(dst1,None)
-    ret1, dst1 = cv2.threshold(dst1,0.6*dst1.max(),255,0)
+    ret1, dst1 = cv2.threshold(dst1,0.01*dst1.max(),255,0)
     dst1 = np.uint8(dst1)
     E1 = np.where(dst1 > 0.01*dst1.max())
 
@@ -143,25 +162,28 @@ def TipDetector(I):
     E = np.where(dst > 0.01*dst.max())
     rospy.logdebug('Shape of E: %s', np.shape(E))
     rospy.logdebug('Shape of E1: %s', np.shape(E1))
-    D=[0,0]
     if not E or not E1:
-        D=[0,0]
-    else:
-	ind1 = np.lexsort((E1[1],E1[0]))
-	C1=[(E1[1][i],E1[0][i]) for i in ind1]
-	ind = np.lexsort((E[1],E[0]))
-	C=[(E[1][i],E[0][i]) for i in ind]
-	#C1=arrangeToList(E1)
-	#C=arrangeToList(E)
-	for i in range(1,np.shape(C1)[0]):
-	    for j in range(1,np.shape(C)[0]):
-		if abs(C1[i][0]-C[j][0])<20 and abs(C1[i][1]-C[j][1])<20:
-		    D=[int(np.uint(C1[i][0]*2)), int(np.uint(C1[i][1]*2))]
+        return 
+    D=[]
+    ind1 = np.lexsort((E1[1],E1[0]))
+    C1=[(E1[1][i],E1[0][i]) for i in ind1]
+    ind = np.lexsort((E[1],E[0]))
+    C=[(E[1][i],E[0][i]) for i in ind]
+    #C1=arrangeToList(E1)
+    #C=arrangeToList(E)
+    for i in range(1,np.shape(C1)[0]):
+        for j in range(1,np.shape(C)[0]):
+       	    if abs(C1[i][0]-C[j][0])<5 and abs(C1[i][1]-C[j][1])<5:
+		D.append([int(np.uint(C1[i][0]*2)), int(np.uint(C1[i][1]*2))])
 	#if np.shape(C)[0]>1:
 	#    D=[int(np.uint(C[1][0]*2)), int(np.uint(C[1][1]*2))]
 	#else:
 	#    D=[0,0]
-    return D#(int(np.uint(C1[1][0]*2)), int(np.uint(C1[1][1]*2)))
+    if not D:
+	return [0,0]
+    else:
+        return count(D)#(int(np.uint(C1[1][0]*2)), int(np.uint(C1[1][1]*2)))
+        #return D[0]
 
 def reduce_size(A,tp,s):
     m = np.shape(A)[0]; n = np.shape(A)[1];
