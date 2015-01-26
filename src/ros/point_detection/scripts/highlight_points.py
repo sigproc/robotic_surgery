@@ -111,7 +111,7 @@ class PointHighlighter(object):
         	cv2.circle(rgb_im,
                     (roi.x_offset, roi.y_offset),
                     5,
-                    (0, 255, 0), # green
+                    (255, 0, 0), # green
                     2 # thickness
                 )
 
