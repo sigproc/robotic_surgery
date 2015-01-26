@@ -87,26 +87,60 @@ def array_to_image(array):
 
     return image_msg
 
+def sort(b):
+    less = []
+    equal = []
+    greater = []
+      
+    if len(b) > 1:
+        pivot = b[0][0][0]
+        for i in range(0,len(b)):
+            if b[i][0][0] < pivot:
+                less.append(b[i])
+            if b[i][0][0] == pivot:
+                equal.append(b[i])
+            if b[i][0][0] > pivot:
+                greater.append(b[i])
+        return sort(less)+equal+sort(greater)
+    else:
+        return b
+
+def count(a):
+    results = []
+    count = []
+    final = []
+    for x in a:
+        if x not in results and x!=(0,0):
+            results.append(x)
+            count.append(0)
+    for x in a:
+        for i in range(0,len(results)):
+            if x==results[i]:
+                count[i]+=1
+    for i in range(0,len(results)):
+        if count[i]==max(count):
+            final.append(results[i])
+    return results    
 
 def PointDetector(I):
     I.flags.writeable = True
 
     K=np.zeros((np.shape(I)[0],np.shape(I)[1],3),np.uint8)*255
     gray = cv2.cvtColor(I, cv2.COLOR_BGR2GRAY)
-    gaussian_blur = cv2.GaussianBlur(gray,(5,5),0)
-    canny_blur = cv2.Canny(gaussian_blur,50,100)
+    gaussian_blur = cv2.GaussianBlur(gray,(7,7),0)
+    canny_blur = cv2.Canny(gaussian_blur,50,110)
     contours,hier = cv2.findContours(canny_blur,1,2)
 
     n=4
 
     for cnt in contours:
-	approx = cv2.approxPolyDP(cnt,0.02*cv2.arcLength(cnt,True),True)
+	approx = cv2.approxPolyDP(cnt,0.09*cv2.arcLength(cnt,True),True)
         if len(approx)==n:
             cv2.drawContours(K,[cnt],0,(0,255,0),1)
 
     gray1 = cv2.cvtColor(K, cv2.COLOR_BGR2GRAY)
-    gaussian_blur1 = cv2.GaussianBlur(gray1,(5,5),0)
-    canny_blur1 = cv2.Canny(gaussian_blur1,50,100)
+    gaussian_blur1 = cv2.GaussianBlur(gray1,(7,7),0)
+    canny_blur1 = cv2.Canny(gaussian_blur1,50,110)
     contours1,hier1 = cv2.findContours(canny_blur1,1,2)
 
     tri=[]
@@ -126,8 +160,10 @@ def PointDetector(I):
                     centre_y=centre_y+approx1[i][0][1]/len(approx1)
                 centre.append((centre_x,centre_y))
                 #tri.append(sort(approx1))
-
-    return centre
+    if not centre:
+	return (0,0)
+    else:
+        return count(centre)
 
 def reduce_size(A,tp,s):
     m = np.shape(A)[0]; n = np.shape(A)[1];
@@ -161,21 +197,3 @@ def reduce_size(A,tp,s):
             A[0::3, 0::3, :]/9 + A[1::3, 0::3, :]/9 + A[2::3, 0::3, :]/9 + A[0::3, 1::3, :]/9 + A[1::3, 1::3, :]/9
             + A[2::3, 1::3, :]/9 + A[0::3, 2::3, :]/9 + A[1::3, 2::3, :]/9 + A[2::3, 2::3, :]/9
         )
-
-def sort(b):
-    less = []
-    equal = []
-    greater = []
-      
-    if len(b) > 1:
-        pivot = b[0][0][0]
-        for i in range(0,len(b)):
-            if b[i][0][0] < pivot:
-                less.append(b[i])
-            if b[i][0][0] == pivot:
-                equal.append(b[i])
-            if b[i][0][0] > pivot:
-                greater.append(b[i])
-        return sort(less)+equal+sort(greater)
-    else:
-        return b    

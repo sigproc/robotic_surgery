@@ -9,7 +9,7 @@
     <param name="saturation" value="128" />
     <param name="autofocus" value="false" />
     <param name="focus" value="0" />
-    <param name="framerate" value="10" />
+    <param name="framerate" value="25" />
   </node>
 
   <!-- View input camera image -->
