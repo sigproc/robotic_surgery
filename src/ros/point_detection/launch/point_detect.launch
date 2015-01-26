@@ -1,0 +1,32 @@
+<launch>
+  <!-- Launch the console so we can see node output -->
+  <node pkg="rqt_console" type="rqt_console" name="console" />
+
+  <!-- Launch the USB webcam node to provide camera images. -->
+  <node pkg="usb_cam" type="usb_cam_node" name="camera" >
+    <param name="video_device" value="/dev/video0" />
+    <param name="contrast" value="128" />
+    <param name="saturation" value="128" />
+    <param name="autofocus" value="false" />
+    <param name="focus" value="0" />
+    <param name="framerate" value="25" />
+  </node>
+
+  <!-- View input camera image -->
+  <node pkg="image_view" type="image_view" name="input_image">
+    <remap from="image" to="camera/image_raw" />
+    <param name="window_name" value="Input video" />
+  </node>
+
+  <!-- Launch the point detector node proper -->
+  <node pkg="point_detection" type="point_detect.py" name="point_detect" />
+
+  <!-- Launch a node to draw boxes around the points -->
+  <node pkg="point_detection" type="highlight_points.py" name="point_images" />
+
+  <!-- View output image -->
+  <node pkg="image_view" type="image_view" name="output_image">
+    <remap from="image" to="point_images/image_raw" />
+    <param name="window_name" value="Detected points" />
+  </node>
+</launch>
