@@ -1,6 +1,6 @@
 <launch>
   <!-- Locate the xacro description of our smart arm robot and parse it-->
-  <arg name="model" value="$(find smart_arm_description)/urdf/smart_arm_robot.xacro" />
+  <arg name="model" value="$(find smart_arm_desc)/robot_desc.xacro" />
   <param name="robot_description" command="$(find xacro)/xacro.py $(arg model)" />
 
   <!-- Start the smart arm controller -->
