@@ -29,5 +29,8 @@
     required="true" />
 
   <!-- Make some movements -->
-  <node name="demo_motion" pkg="smart_arm_controller" type="prop_closed.py" />
+  <node name="demo_motion" pkg="smart_arm_controller" type="prop_closed_2nd_order.py" />
+  
+  <!-- Log output -->
+  <node name="listener" pkg="smart_arm_controller" type="listen_3rdjoint.py" />
 </launch>
