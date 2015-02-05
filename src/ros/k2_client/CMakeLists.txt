@@ -115,11 +115,11 @@ include_directories("include/k2_client")
 #   src/${PROJECT_NAME}/k2_client.cpp
 # )
 
-add_executable(startAudio src/k2_client/startAudio.cpp)
-add_executable(startBody src/k2_client/startBody.cpp)
-add_executable(startDepth src/k2_client/startDepth.cpp)
-add_executable(startIR src/k2_client/startIR.cpp)
-add_executable(startRGB src/k2_client/startRGB.cpp)
+add_executable(startAudio ${PROJECT_SOURCE_DIR}/src/k2_client/startAudio.cpp)
+add_executable(startBody ${PROJECT_SOURCE_DIR}/src/k2_client/startBody.cpp)
+add_executable(startDepth ${PROJECT_SOURCE_DIR}/src/k2_client/startDepth.cpp)
+add_executable(startIR ${PROJECT_SOURCE_DIR}/src/k2_client/startIR.cpp)
+add_executable(startRGB ${PROJECT_SOURCE_DIR}/src/k2_client/startRGB.cpp)
 
 ## Declare a cpp executable
 # add_executable(k2_client_node src/k2_client_node.cpp)

@@ -1,0 +1,17 @@
+<launch>
+
+	<node pkg="rosbag" name="play" type="play" args="$(find surface_analysis)/data/test_data.bag -l"/>
+
+	<node pkg="surface_analysis" type="segment.py" name="segment" output="screen">
+		<remap from="depthImage" to="depth/image_raw" />
+		<remap from="colourImage" to="rgb/image_color" />
+		<remap from="irImage" to="ir/image_ir" />
+    </node>
+
+    <node pkg="depth_view" type="depth_view.py" name="depth_view" output="screen">
+		<remap from="image" to="segmented/depth" />
+		<param name="window_name" value="Depth image" />
+    </node>
+</launch>
+
+<!--/home/ros/workspace/src/robotic_surgery/surface_analysis/data/test_data.bag-->
