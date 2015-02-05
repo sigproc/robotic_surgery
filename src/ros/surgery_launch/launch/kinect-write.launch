@@ -7,7 +7,7 @@
 		<node name="startBody" pkg="k2_client" type="startBody"/>
 		<node name="startAudio" pkg="k2_client" type="startAudio"/>
 
-		<node name="record" pkg="rosbag" type="record" args="-O test_data --limit=10 rgb/image_color depth/image_raw ir/image_ir"
+		<node name="record" pkg="rosbag" type="record" args="-O test_data --limit=1 rgb/image_color depth/image_raw ir/image_ir"
 		/>
 	</group>
 

@@ -1,6 +1,6 @@
 <launch>
 
-	<node pkg="rosbag" name="play" type="play" args="$(find surface_analysis)/data/test_data.bag -l"/>
+	<node pkg="rosbag" name="play" type="play" args="$(find surface_analysis)/data/string_static.bag -l"/>
 
 	<node pkg="surface_analysis" type="segment.py" name="segment" output="screen">
 		<remap from="depthImage" to="depth/image_raw" />
@@ -13,5 +13,3 @@
 		<param name="window_name" value="Depth image" />
     </node>
 </launch>
-
-<!--/home/ros/workspace/src/robotic_surgery/surface_analysis/data/test_data.bag-->
