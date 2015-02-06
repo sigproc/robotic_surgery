@@ -46,15 +46,13 @@ joint_names = ('shoulder_pan_controller',
 'wrist_roll_controller',
 'claw_controller')
 
-<<<<<<< HEAD
 joint_commands = [(-0.9, 1.972222, -1.972222, 0.0, 0.0),
                    (-0.9, 1.1, -1.25, 0.0, 0.0)]
-=======
+
 joint_commands = [(0.0, 1.9722, -1.9722, 0.0, 1.9722),
                    (0.0, 1.501669, -1.254864, 0.0, 1.9722),
                    (0.0, 1.171931, -1.172695, 0.0, 1.9722),
                    (0.0, -0.591808, 1.700589, 2.307749, 1.9722)]
->>>>>>> 89134397531d5c9985fe84ec4fe2725368d69241
 
 if __name__ == '__main__':
     pubs = [rospy.Publisher(name + '/command', Float64) for name in joint_names]

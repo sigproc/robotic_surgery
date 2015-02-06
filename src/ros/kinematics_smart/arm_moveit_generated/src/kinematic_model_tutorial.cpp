@@ -1,4 +1,6 @@
 #include <ros/ros.h>
+#include "std_msgs/String.h"
+#include <sstream>
 // MoveIt!
 #include <moveit/robot_model_loader/robot_model_loader.h>
 #include <moveit/robot_model/robot_model.h>
@@ -60,11 +62,11 @@ int main(int argc, char **argv)
     ROS_INFO_STREAM("Translation: " << end_effector_state.translation());
     ROS_INFO_STREAM("Rotation: " << end_effector_state.rotation());
     
-    Eigen::Matrix3d r;
+    /*Eigen::Matrix3d r;
     r << -1, 0, 0,
           0, 0, -1,
           0, 1, 0;
-    /*double rotation_matrix[3][3] = {
+    double rotation_matrix[3][3] = {
                                     {0.56, 0.26, 0.564},
                                     {0.76, 0.12, 0.134},
                                     {0.62, 0.77, 0.23}
@@ -73,7 +75,10 @@ int main(int argc, char **argv)
     double translation_vector = {0.1, 0, 0};*/
     
     Eigen::Vector3d v;
-    v << 0.1, 0, 0.1;
+    Eigen::Vector3d cobra_v;
+    v << 0.1285793, 0, 0.469884;
+    //This is the eef position for cobra pose
+    cobra_v << 0.0285793, 0, 0.369884;
     
     /*end_effector_state.rotate(r);*/
         
@@ -89,8 +94,12 @@ int main(int argc, char **argv)
     
     //Vector to transform eef position
     Eigen::Vector3d v_prime;
+    Eigen::Vector3d cobra_v_prime;
     v_prime = frame_transform_Matrix.inverse()*v;
+    cobra_v_prime = frame_transform_Matrix.inverse()*(-cobra_v);
     
+    //Remove the cobra_pose component so I can specify 3D space directly
+    end_effector_state.translate(cobra_v_prime);
     end_effector_state.translate(v_prime);
     
     std::cout << "v_prime is "<< v_prime << std::endl;
