@@ -1,4 +1,6 @@
 #include <ros/ros.h>
+#include <iostream>
+#include "std_msgs/Float64.h"
 // MoveIt!
 #include <moveit/robot_model_loader/robot_model_loader.h>
 #include <moveit/robot_model/robot_model.h>
@@ -20,9 +22,30 @@ void print_kinematic_state(robot_state::RobotStatePtr kinematic_state, const rob
     }
 }
 
+std::vector<double> get_kinematic_state(robot_state::RobotStatePtr kinematic_state, const robot_state::JointModelGroup* joint_model_group) {
+    // Get joint names
+    const std::vector<std::string> &joint_names = joint_model_group->getJointModelNames();
+
+    // Get Joint Values
+    std::vector<double> joint_values;
+
+    kinematic_state->copyJointGroupPositions(joint_model_group, joint_values);
+    
+    for(std::size_t i = 0; i < joint_names.size(); ++i)
+    {
+        ROS_INFO("Joint %s: %f", joint_names[i].c_str(), joint_values[i]);
+    }
+    
+    return joint_values;
+}
+
+
 int main(int argc, char **argv)
 {
     ros::init (argc, argv, "arm_kinematics");
+    
+    ros::NodeHandle n;
+    
     ros::AsyncSpinner spinner(1);
     spinner.start();
 
@@ -60,11 +83,11 @@ int main(int argc, char **argv)
     ROS_INFO_STREAM("Translation: " << end_effector_state.translation());
     ROS_INFO_STREAM("Rotation: " << end_effector_state.rotation());
     
-    Eigen::Matrix3d r;
+    /*Eigen::Matrix3d r;
     r << -1, 0, 0,
           0, 0, -1,
           0, 1, 0;
-    /*double rotation_matrix[3][3] = {
+    double rotation_matrix[3][3] = {
                                     {0.56, 0.26, 0.564},
                                     {0.76, 0.12, 0.134},
                                     {0.62, 0.77, 0.23}
@@ -73,7 +96,10 @@ int main(int argc, char **argv)
     double translation_vector = {0.1, 0, 0};*/
     
     Eigen::Vector3d v;
-    v << 0.1, 0, 0.1;
+    Eigen::Vector3d cobra_v;
+    v << 0.1285793, 0, 0.469884;
+    //This is the eef position for cobra pose
+    cobra_v << 0.0285793, 0, 0.369884;
     
     /*end_effector_state.rotate(r);*/
         
@@ -89,8 +115,12 @@ int main(int argc, char **argv)
     
     //Vector to transform eef position
     Eigen::Vector3d v_prime;
+    Eigen::Vector3d cobra_v_prime;
     v_prime = frame_transform_Matrix.inverse()*v;
+    cobra_v_prime = frame_transform_Matrix.inverse()*(-cobra_v);
     
+    //Remove the cobra_pose component so I can specify 3D space directly
+    end_effector_state.translate(cobra_v_prime);
     end_effector_state.translate(v_prime);
     
     std::cout << "v_prime is "<< v_prime << std::endl;
@@ -104,7 +134,38 @@ int main(int argc, char **argv)
 
     if (found_ik)
     {
-        print_kinematic_state(kinematic_state, joint_model_group);
+        std::vector<double> joint_vector = get_kinematic_state(kinematic_state, joint_model_group);
+
+        ros::Publisher shoulder_pan_pub = n.advertise<std_msgs::Float64>("shoulder_pan_controller/command", 100);
+        ros::Publisher shoulder_pitch_pub = n.advertise<std_msgs::Float64>("shoulder_pitch_controller/command", 1000);
+        ros::Publisher elbow_flex_pub = n.advertise<std_msgs::Float64>("elbow_flex_controller/command", 100);
+        ros::Publisher wrist_roll_pub = n.advertise<std_msgs::Float64>("wrist_roll_controller/command", 100);
+        ros::Publisher claw_controller_pub = n.advertise<std_msgs::Float64>("claw_controller/command", 100);
+        ros::Rate loop_rate(0.2);
+        
+        int count = 0;
+        while (ros::ok())
+            {
+            std_msgs::Float64 msg; 
+            
+            msg.data = joint_vector[0];
+            shoulder_pan_pub.publish(msg);
+            msg.data = joint_vector[1];
+            shoulder_pitch_pub.publish(msg);
+            msg.data = joint_vector[2];
+            elbow_flex_pub.publish(msg);
+            msg.data = joint_vector[3];
+            wrist_roll_pub.publish(msg);
+            msg.data = joint_vector[4];
+            claw_controller_pub.publish(msg);
+            
+            ros::spinOnce();
+            loop_rate.sleep();
+
+            ++count;
+            }
+         
+        return 0;
     }
 
     else
