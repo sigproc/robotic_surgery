@@ -1,6 +1,6 @@
 #include <ros/ros.h>
-#include "std_msgs/String.h"
-#include <sstream>
+#include <iostream>
+#include "std_msgs/Float64.h"
 // MoveIt!
 #include <moveit/robot_model_loader/robot_model_loader.h>
 #include <moveit/robot_model/robot_model.h>
@@ -22,9 +22,30 @@ void print_kinematic_state(robot_state::RobotStatePtr kinematic_state, const rob
     }
 }
 
+std::vector<double> get_kinematic_state(robot_state::RobotStatePtr kinematic_state, const robot_state::JointModelGroup* joint_model_group) {
+    // Get joint names
+    const std::vector<std::string> &joint_names = joint_model_group->getJointModelNames();
+
+    // Get Joint Values
+    std::vector<double> joint_values;
+
+    kinematic_state->copyJointGroupPositions(joint_model_group, joint_values);
+    
+    for(std::size_t i = 0; i < joint_names.size(); ++i)
+    {
+        ROS_INFO("Joint %s: %f", joint_names[i].c_str(), joint_values[i]);
+    }
+    
+    return joint_values;
+}
+
+
 int main(int argc, char **argv)
 {
     ros::init (argc, argv, "arm_kinematics");
+    
+    ros::NodeHandle n;
+    
     ros::AsyncSpinner spinner(1);
     spinner.start();
 
@@ -113,7 +134,38 @@ int main(int argc, char **argv)
 
     if (found_ik)
     {
-        print_kinematic_state(kinematic_state, joint_model_group);
+        std::vector<double> joint_vector = get_kinematic_state(kinematic_state, joint_model_group);
+
+        ros::Publisher shoulder_pan_pub = n.advertise<std_msgs::Float64>("shoulder_pan_controller/command", 100);
+        ros::Publisher shoulder_pitch_pub = n.advertise<std_msgs::Float64>("shoulder_pitch_controller/command", 1000);
+        ros::Publisher elbow_flex_pub = n.advertise<std_msgs::Float64>("elbow_flex_controller/command", 100);
+        ros::Publisher wrist_roll_pub = n.advertise<std_msgs::Float64>("wrist_roll_controller/command", 100);
+        ros::Publisher claw_controller_pub = n.advertise<std_msgs::Float64>("claw_controller/command", 100);
+        ros::Rate loop_rate(0.2);
+        
+        int count = 0;
+        while (ros::ok())
+            {
+            std_msgs::Float64 msg; 
+            
+            msg.data = joint_vector[0];
+            shoulder_pan_pub.publish(msg);
+            msg.data = joint_vector[1];
+            shoulder_pitch_pub.publish(msg);
+            msg.data = joint_vector[2];
+            elbow_flex_pub.publish(msg);
+            msg.data = joint_vector[3];
+            wrist_roll_pub.publish(msg);
+            msg.data = joint_vector[4];
+            claw_controller_pub.publish(msg);
+            
+            ros::spinOnce();
+            loop_rate.sleep();
+
+            ++count;
+            }
+         
+        return 0;
     }
 
     else
