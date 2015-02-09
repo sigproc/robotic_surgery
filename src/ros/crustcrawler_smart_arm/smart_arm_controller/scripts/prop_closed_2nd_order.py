@@ -28,7 +28,8 @@ current_pose = matrix(((-0.9, 1.972222, -1.972222, 0.0, 0.0),
 #goal pose and step size
 #goal pose -- I am not sure why I need 2 lines .. Why delay? The first row is the goal position you want to achieve
 #The second row is just the initial position -- listen in practice
-joint_commands_goal = matrix(((-0.9, 1.1, -1.25, 0.0, 0.0),
+#joint_commands_goal = matrix(((-0.9, 1.1, -1.25, 0.0, 0.0),
+joint_commands_goal = matrix(((-0.9, 1.972222, -1.972222, 0.0, 0.0),
                               (0.0, 0.0, 0.0, 0.0, 0.0)))
 
 #Poles should be on the real axis to avoid overshoot and oscillations
@@ -36,6 +37,7 @@ r = 0.95
 alpha = r*r
 k = 1+r*r-2*r*0.9986
 
+"""
 def callback(data):
     a = data.position
     
@@ -60,7 +62,28 @@ def callback(data):
 def listen_callback(event):
     #pose = current_pose
     rospy.logerr(current_pose[0])
+"""
+    
+def get_shoulder_pan(event):
+    """Called when a new command is sent to the arm."""
+    joint_commands_goal[0,0] = event.data
+    
+def get_shoulder_pitch(event):
+    """Called when a new command is sent to the arm."""
+    joint_commands_goal[0,1] = event.data
    
+def get_elbow_flex(event):
+    """Called when a new command is sent to the arm."""
+    joint_commands_goal[0,2] = event.data
+
+def get_wrist_roll(event):
+    """Called when a new command is sent to the arm."""
+    joint_commands_goal[0,3] = event.data
+
+def get_claw(event):
+    """Called when a new command is sent to the arm."""
+    joint_commands_goal[0,4] = event.data
+
 if __name__ == '__main__':
     pubs = [rospy.Publisher(name + '/command', Float64) for name in joint_names]
     rospy.init_node('make_goal_pose', anonymous=True)
@@ -70,8 +93,13 @@ if __name__ == '__main__':
     #joint_commands_goal must come after current_pose
     pose = current_pose
     joint_commands_goal[1] = pose[0]
-    
-    #rospy.Subscriber("/joint_states", sensor_msgs.msg.JointState, callback)
+   
+    rospy.Subscriber('shoulder_pan_controller/intermediate_command', Float64, get_shoulder_pan)   
+    rospy.Subscriber('shoulder_pitch_controller/intermediate_command', Float64, get_shoulder_pitch)
+    rospy.Subscriber('elbow_flex_controller/intermediate_command', Float64, get_elbow_flex)
+    rospy.Subscriber('wrist_roll_controller/intermediate_command', Float64, get_wrist_roll)    
+    rospy.Subscriber('claw_controller/intermediate_command', Float64, get_claw)
+        
     #rospy.Timer(rospy.Duration(0.01), listen_callback)
     
     for i in range(len(pubs)):

@@ -136,11 +136,11 @@ int main(int argc, char **argv)
     {
         std::vector<double> joint_vector = get_kinematic_state(kinematic_state, joint_model_group);
 
-        ros::Publisher shoulder_pan_pub = n.advertise<std_msgs::Float64>("shoulder_pan_controller/command", 100);
-        ros::Publisher shoulder_pitch_pub = n.advertise<std_msgs::Float64>("shoulder_pitch_controller/command", 1000);
-        ros::Publisher elbow_flex_pub = n.advertise<std_msgs::Float64>("elbow_flex_controller/command", 100);
-        ros::Publisher wrist_roll_pub = n.advertise<std_msgs::Float64>("wrist_roll_controller/command", 100);
-        ros::Publisher claw_controller_pub = n.advertise<std_msgs::Float64>("claw_controller/command", 100);
+        ros::Publisher shoulder_pan_pub = n.advertise<std_msgs::Float64>("shoulder_pan_controller/intermediate_command", 100);
+        ros::Publisher shoulder_pitch_pub = n.advertise<std_msgs::Float64>("shoulder_pitch_controller/intermediate_command", 1000);
+        ros::Publisher elbow_flex_pub = n.advertise<std_msgs::Float64>("elbow_flex_controller/intermediate_command", 100);
+        ros::Publisher wrist_roll_pub = n.advertise<std_msgs::Float64>("wrist_roll_controller/intermediate_command", 100);
+        ros::Publisher claw_controller_pub = n.advertise<std_msgs::Float64>("claw_controller/intermediate_command", 100);
         ros::Rate loop_rate(0.2);
         
         int count = 0;

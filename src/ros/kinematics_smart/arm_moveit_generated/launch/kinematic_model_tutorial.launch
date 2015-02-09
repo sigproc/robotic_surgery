@@ -40,4 +40,8 @@
     <rosparam command="load"
               file="$(find arm_moveit_generated)/config/kinematics.yaml"/>
   </node>
+  
+  <!-- Make some movements -->
+  <node name="demo_motion" pkg="smart_arm_controller" type="prop_closed_2nd_order.py" />
+  
 </launch>
