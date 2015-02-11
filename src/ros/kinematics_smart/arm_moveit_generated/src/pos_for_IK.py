@@ -14,7 +14,7 @@ import sys
 import sensor_msgs.msg
 from copy import copy, deepcopy
 
-desired_position = [0.1285793, 0, 0.469884]
+desired_position = [0.1285793, 0.05, 0.469884]
 
 if __name__ == '__main__':
     pubs = rospy.Publisher('pos_for_IK', Float64MultiArray, queue_size=10)
