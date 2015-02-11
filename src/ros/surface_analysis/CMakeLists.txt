@@ -92,10 +92,13 @@ catkin_package(
 
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
-# include_directories(include)
-include_directories(
-  ${catkin_INCLUDE_DIRS}
-)
+include_directories(${catkin_INCLUDE_DIRS})
+include_directories("include")
+
+# PCL required actions
+include_directories(${PCL_INCLUDE_DIRS})
+link_directories(${PCL_LIBRARY_DIRS})
+add_definitions(${PCL_DEFINITIONS})
 
 ## Declare a cpp library
 # add_library(surface_analysis
@@ -103,7 +106,7 @@ include_directories(
 # )
 
 ## Declare a cpp executable
-# add_executable(surface_analysis_node src/surface_analysis_node.cpp)
+add_executable(surface src/surface.cpp)
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes

@@ -2,7 +2,7 @@
 
 	<node pkg="rosbag" name="play" type="play" args="$(find surface_analysis)/data/string_static.bag -l"/>
 
-	<node pkg="surface_analysis" type="segment.py" name="segment" output="screen">
+	<node pkg="surface_analysis" type="surface" name="surface" output="screen">
 		<remap from="depthImage" to="depth/image_raw" />
 		<remap from="colourImage" to="rgb/image_color" />
 		<remap from="irImage" to="ir/image_ir" />
