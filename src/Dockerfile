@@ -21,6 +21,9 @@ RUN usermod -a -G sudo ros
 # Add a PPA for OpenRave. (See http://moveit.ros.org/wiki/Kinematics/IKFast)
 RUN add-apt-repository ppa:openrave/release
 
+# PPA for the Point Cloud Library
+RUN add-apt-repository ppa:v-launchpad-jochen-sprickerhof-de/pcl
+
 # Make sure package sources are up to date
 RUN apt-get -y update
 
@@ -49,6 +52,9 @@ RUN apt-get -y install libopencv-dev python-opencv
 
 # JsonCPP library for k2_client
 RUN apt-get -y install libjsoncpp-dev
+
+# Install Point Cloud Library
+RUN apt-get -y install libpcl-all
 
 # Comment out annoying line which stops .bashrc from sourcing for
 # non-interactive shells.

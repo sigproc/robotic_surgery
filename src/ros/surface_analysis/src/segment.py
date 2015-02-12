@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import rospy
+import math
 import cv2
 from cv_bridge import CvBridge, CvBridgeError
 from matplotlib import pyplot
@@ -29,12 +30,40 @@ class SegmentationNode(object):
     # Segmentation logic
     def segment(self, image):
 
+        # Set the target depth and range
+        target = 1500.0
+        rng = 500.0
+
+        # Crop the image
+        image = self.crop(image, target)
+
         # Threshold depth values between an upper and lower limit
-        upper = 2000
-        lower = 1000
-        image = self.threshold(image, lower, upper)
+        image = self.threshold(image, target-rng, target+rng)
+
         return image
         
+    def crop(self, image, target):
+        # Constants representing the field of view of the Kinect
+        MINDEPTH = 400.0
+        MAXDEPTH = 4000.0
+        HFOV = 70.6 * math.pi/180   # Horizontal field of view in radians
+        VFOV = 60 * math.pi/180     # Vertical field of view in radians
+
+        # Cropped dimensions
+        width,height = image.shape[:2]
+        print "Width = {} Height = {}".format(width,height)
+        cw = target / MAXDEPTH * width
+        ch = target / MAXDEPTH * height
+
+        left = (width - cw) / 2
+        top = (height - ch) / 2
+        right = (width + cw) / 2
+        bottom = (height + ch) / 2 
+        print "Target {} HFOV {} tan {} cw {}".format(target, HFOV, math.tan(HFOV), cw)
+        image = image[left:right, top:bottom]
+
+        return image
+
 
     def threshold(self, image, lower, upper):
         mask = numpy.logical_and(image > lower,image < upper)

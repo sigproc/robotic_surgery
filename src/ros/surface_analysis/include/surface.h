@@ -1,9 +1,11 @@
-//#include <ros/ros.h>
-//#include <pcl_ros/point_cloud.h>
-//#include <pcl/point_types.h>
-//#include "sensor_msgs/Image.h"
+#include "ros/ros.h"
+#include <pcl_ros/point_cloud.h>
+#include <pcl/point_types.h>
+#include "sensor_msgs/Image.h"
 
-//typedef pcl::PointCloud<pcl::PointXYZ> PointCloud;
+typedef pcl::PointCloud<pcl::PointXYZ> PointCloud;
+
+//void LoadDepth(const sensor_msgs::Image::ConstPtr)
 
 class SurfaceAnalyser
 {
@@ -13,4 +15,4 @@ class SurfaceAnalyser
 //	SurfaceAnalyser(void)
 //	PointCloud* PCLfromDepth(uint[] depth);
 //	PointCloud* Segment(PointCloud* input);
-}
+};

@@ -85,6 +85,11 @@ catkin_package(
 #  CATKIN_DEPENDS roscpp rospy std_msgs
 #  DEPENDS system_lib
 )
+find_package(PCL 1.3 REQUIRED COMPONENTS common io)
+
+find_package( Boost COMPONENTS REQUIRED)
+include_directories( ${Boost_INCLUDE_DIRS} )
+find_package(Threads)
 
 ###########
 ## Build ##
