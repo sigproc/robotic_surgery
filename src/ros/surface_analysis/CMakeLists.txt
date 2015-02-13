@@ -7,11 +7,13 @@ project(surface_analysis)
 find_package(catkin REQUIRED COMPONENTS
   roscpp
   rospy
+  pcl_ros
   std_msgs
+  sensor_msgs
 )
 
 ## System dependencies are found with CMake's conventions
-# find_package(Boost REQUIRED COMPONENTS system)
+find_package(Boost REQUIRED COMPONENTS system)
 
 
 ## Uncomment this if the package has a setup.py. This macro ensures
@@ -82,14 +84,11 @@ find_package(catkin REQUIRED COMPONENTS
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES surface_analysis
-#  CATKIN_DEPENDS roscpp rospy std_msgs
+#  CATKIN_DEPENDS roscpp rospy std_msgs ros_pcl
 #  DEPENDS system_lib
 )
-find_package(PCL 1.3 REQUIRED COMPONENTS common io)
+find_package(PCL REQUIRED COMPONENTS common io)
 
-find_package( Boost COMPONENTS REQUIRED)
-include_directories( ${Boost_INCLUDE_DIRS} )
-find_package(Threads)
 
 ###########
 ## Build ##
@@ -112,6 +111,7 @@ add_definitions(${PCL_DEFINITIONS})
 
 ## Declare a cpp executable
 add_executable(surface src/surface.cpp)
+target_link_libraries(surface ${Boost_LIBRARIES})
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
