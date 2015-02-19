@@ -1,0 +1,46 @@
+<launch>
+
+  <!-- Locate the xacro description of our smart arm robot and parse it-->
+  <arg name="model" value="$(find smart_arm_desc)/robot_desc.xacro" />
+  <param name="robot_description" command="$(find xacro)/xacro.py $(arg model)" />
+  
+  <!-- Start the smart arm controller -->
+  <include file="$(find smart_arm_controller)/launch/smart_arm.launch" />
+  
+  <!-- Publish dynamixel joint states on the /joint_states topic -->
+  <rosparam param="joints">
+- "shoulder_pan_controller"
+- "shoulder_pitch_controller"
+- "elbow_flex_controller"
+- "wrist_roll_controller"
+- "claw_controller"
+  </rosparam>
+  <node name="joint_state_publisher" pkg="smart_arm_controller"
+    type="dynamixel_joint_state_publisher.py" output="screen" />
+
+  <!-- Use joint states to publish tf-s -->
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher" />
+
+  <!-- publish a static transform for /base_link relative to /world_link -->
+  <node pkg="tf" type="static_transform_publisher" name="base_link_broadcaster"
+    args="0 0 0 0 0 0 world_link base_link 100" />
+
+  <include file="$(find arm_moveit_generated)/launch/planning_context.launch">
+    <arg name="load_robot_description" value="true"/>
+  </include>
+
+  <node name="kinematic_model_tutorial"
+        pkg="arm_moveit_generated"
+        type="kinematic_model_tutorial"
+        respawn="false" output="screen">
+    <rosparam command="load"
+              file="$(find arm_moveit_generated)/config/kinematics.yaml"/>
+  </node>
+  
+  <!-- Publish desired position to IK -->
+  <node name="position_for_IK" pkg="arm_moveit_generated" type="pos_for_IK.py" />
+  
+  <!-- Make some movements -->
+  <node name="demo_motion" pkg="smart_arm_controller" type="prop_closed_2nd_order.py" />
+  
+</launch>
