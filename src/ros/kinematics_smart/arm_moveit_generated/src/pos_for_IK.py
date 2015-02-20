@@ -14,8 +14,9 @@ import sys
 import sensor_msgs.msg
 from copy import copy, deepcopy
 
+#The alternating 2 desired positions for demo
 desired_positions = [
-    [0.1285793, 0.05, 0.469884],
+    [0.0285793, 0.0, 0.469884],
     [0.0285793, 0.0, 0.369884]
 ]
 

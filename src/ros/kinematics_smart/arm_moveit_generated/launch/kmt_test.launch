@@ -29,9 +29,9 @@
     <arg name="load_robot_description" value="true"/>
   </include>
 
-  <node name="kinematic_model_tutorial"
+  <node name="IK"
         pkg="arm_moveit_generated"
-        type="kinematic_model_tutorial"
+        type="IK"
         respawn="false" output="screen">
     <rosparam command="load"
               file="$(find arm_moveit_generated)/config/kinematics.yaml"/>
@@ -41,6 +41,6 @@
   <node name="position_for_IK" pkg="arm_moveit_generated" type="pos_for_IK.py" />
   
   <!-- Make some movements -->
-  <node name="demo_motion" pkg="smart_arm_controller" type="prop_closed_2nd_order.py" />
+  <node name="motion" pkg="smart_arm_controller" type="prop_closed_2nd_order.py" />
   
 </launch>

@@ -1,13 +1,9 @@
 #!/usr/bin/env python
-#remove rospy.spin() and subscriber for this code to work.. how to get subscriber to work?
 
 import roslib
 roslib.load_manifest('smart_arm_controller')
-
 import rospy
-
 from std_msgs.msg import Float64
-
 from numpy import matrix, array
 import numpy as np
 import sys

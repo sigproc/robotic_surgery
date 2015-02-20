@@ -29,6 +29,9 @@ link_directories(${catkin_LIBRARY_DIRS})
 add_executable(kinematic_model_tutorial src/kinematic_model_tutorial.cpp)
 target_link_libraries(kinematic_model_tutorial ${catkin_LIBRARIES} ${Boost_LIBRARIES})
 
+add_executable(IK src/IK.cpp)
+target_link_libraries(IK ${catkin_LIBRARIES} ${Boost_LIBRARIES})
+
 add_executable(ros_api_tutorial src/ros_api_tutorial.cpp)
 target_link_libraries(ros_api_tutorial ${catkin_LIBRARIES} ${Boost_LIBRARIES})
 
