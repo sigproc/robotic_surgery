@@ -66,7 +66,7 @@ class PropControllerState:
 
             delta = self.commanded_pose - p0
             delta_mag = np.sqrt(np.sum(delta * delta))
-            epsilon = 0.05
+            epsilon = 0.02
 
             #rospy.logerr('p0: '+ str(p0))
             #rospy.logerr('p1: '+ str(p1))
@@ -77,7 +77,9 @@ class PropControllerState:
 
             # If we're sufficiently close, or have gone mad, transition to listening
             # state and reset the commanded pose.
-            if delta_mag <= epsilon or delta_mag >= 3:
+            
+            #The IK works for point (0.1, 0, 0) but it is not publishing
+            if delta_mag <= epsilon or delta_mag >= 6:
                 #rospy.logerr('Finished with delta mag: ' + str(delta_mag))
                 self.commanded_pose = np.ones(5) * np.nan
                 self.state = PropControllerState.LISTENING
@@ -85,7 +87,6 @@ class PropControllerState:
                 # Actually publish *IF* we have some publishers
                 for i in range(len(self.pubs)):
                     self.pubs[i].publish(p0[i])
-            
         
     def commanded_pose_updated(self):
         # We transition to the controlling state when we have a full commanded
@@ -118,7 +119,8 @@ def get_wrist_roll(event):
 
 def get_claw(event):
     """Called when a new command is sent to the arm."""
-    c_state.commanded_pose[4] = event.data
+    #Claw should always be closed
+    c_state.commanded_pose[4] = 1.9722
     c_state.commanded_pose_updated()
 
 def current_shoulder_pan(event):

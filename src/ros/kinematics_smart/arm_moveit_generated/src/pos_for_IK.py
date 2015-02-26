@@ -16,8 +16,10 @@ from copy import copy, deepcopy
 
 #The alternating 2 desired positions for demo
 desired_positions = [
+    [0.0285793, 0.0, 0.369884],
     [0.0285793, 0.0, 0.469884],
-    [0.0285793, 0.0, 0.369884]
+    [0.1285793, 0.0, 0.469884],
+    [0.1285793, 0.0, 0.369884]
 ]
 
 if __name__ == '__main__':
