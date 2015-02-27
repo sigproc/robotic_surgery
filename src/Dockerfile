@@ -72,6 +72,8 @@ RUN chown -R ros:ros /home/ros/.config/autostart
 
 # Copy X config
 ADD config/X11 /etc/X11
+# Ensure the X config is readable by all users
+RUN chmod oug+r /etc/X11/*
 
 # Copy local executables
 ADD config/bin/Xdummy /usr/bin/
