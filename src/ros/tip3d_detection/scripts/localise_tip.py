@@ -2,14 +2,15 @@
 
 import rospy
 from sensor_msgs.msg import Image
+from tip3d_detection import image_to_array
 
 STATE={"left":None,"right":None}
 
 def handle_images():
-    rospy.loginfo("Left: %s, Right: %s",STATE["left"].width, STATE["right"].width)
+    rospy.loginfo("Left: %s, Right: %s",STATE["left"].shape, STATE["right"].shape)
 
 def got_image(side, image_message):
-    STATE[side]=image_message
+    STATE[side]=image_to_array(image_message)
     if STATE["left"] is not None and STATE["right"] is not None:
         handle_images()
         
