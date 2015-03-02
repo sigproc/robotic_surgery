@@ -3,7 +3,7 @@
 import rospy
 from sensor_msgs.msg import Image
 from tip3d_detection_msgs.msg import Tip
-from tip3d_detection import image_to_array
+from tip3d_detection import image_to_array, TipDetector, world_coordinates
 
 import numpy as np
 
@@ -16,6 +16,13 @@ def handle_images():
     tip_msg.header = STATE["last_image_header"]
     
     # TODO: process STATE["left"] and STATE["right"] and get actual tip location
+    # Detect tips in the image
+    detect_tip = TipDetector
+    #tips2d = detect_tip(STATE["left"])
+
+    # Convert to robot's world coordinates
+    convert_world = world_coordinates
+    #tips3d = convert_world(tips2d[0],tips2d[1],STATE["left"],STATE["right"]):
     
     # Set position to fake values
     tip_msg.x = STATE["left"].shape[0]
