@@ -1,9 +1,30 @@
 #!/usr/bin/env python
-
+# The MIT License (MIT)
+#
+# Copyright (c) 2015 Duong Le <tdl28@cam.ac.uk>
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+# THE SOFTWARE.
+#
 import rospy
 from sensor_msgs.msg import Image
 from tip3d_detection_msgs.msg import Tip
-from tip3d_detection import image_to_array
+from tip3d_detection import image_to_array, TipDetector, world_coordinates
 
 import numpy as np
 
@@ -16,11 +37,18 @@ def handle_images():
     tip_msg.header = STATE["last_image_header"]
     
     # TODO: process STATE["left"] and STATE["right"] and get actual tip location
+    # Detect tips in the image
+    detect_tip = TipDetector
+    tips2d = detect_tip()
+
+    # Convert to robot's world coordinates
+    convert_world = world_coordinates
+    tips3d = convert_world(tips2d[0],tips2d[1],STATE["left"],STATE["right"])
     
-    # Set position to fake values
-    tip_msg.x = STATE["left"].shape[0]
-    tip_msg.y = STATE["right"].shape[0]
-    tip_msg.z = np.random.random()
+    # Set positions to fake values
+    tip_msg.x = np.random.random() #tips3d[0]
+    tip_msg.y = np.random.random() #tips3d[1]
+    tip_msg.z = np.random.random() #tips3d[2]
 
     # Publish the tip message to the other nodes which are interested
     STATE["tip_publisher"].publish(tip_msg)

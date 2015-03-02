@@ -1,6 +1,6 @@
 # The MIT License (MIT)
 #
-# Copyright (c) 2014 Rich Wareham <rjw57@cantab.net>
+# Copyright (c) 2015 Duong Le <tdl28@cam.ac.uk>
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -29,7 +29,6 @@ import cv2
 import numpy as np
 import rospy
 import math
-from scipy import ndimage
 
 # Import the ROS message type(s) we'll be using.
 from sensor_msgs.msg import Image
@@ -87,115 +86,9 @@ def array_to_image(array):
 
     return image_msg
 
-def count(a):
-    results = []
-    count = []
-    final=[]
-    for x in a:
-        if x not in results and x!=(0,0):
-            results.append(x)
-            count.append(0)
-    for x in a:
-        for i in range(0,len(results)):
-            if x==results[i]:
-                count[i]+=1
-    for i in range(0,len(results)):
-	count[i]=max(count)
-	final.append(results[i])
-    for i in range(0,len(results)):
-        if count[i]==max(count):
-            final.append(results[i])	
-    return max(final)
-
-def TipDetector(I):
-    # Detect tips in an image
-
-    I.flags.writeable = True
-
-    # reduce level of brightness & find orange
-
-    #n=0.95
-    Y=0.3*I[:,:,2]+0.6*I[:,:,1]+0.1*I[:,:,0]
-    V=0.4375*I[:,:,2]-0.375*I[:,:,1]-0.0625*I[:,:,0]
-    U=-0.15*I[:,:,2]-0.3*I[:,:,1]+0.45*I[:,:,0]
-    #I[:,:,2]=n*Y+1.6*V
-    #I[:,:,1]=n*Y-0.333*U-0.8*V
-    #I[:,:,0]=n*Y+2*U
-
-    M=np.ones((np.shape(I)[0], np.shape(I)[1]), np.uint8)*255
-    for i in range(0,np.shape(I)[0]):
-        for j in range(0,np.shape(I)[1]):
-#            if sum(I[i,j,:]**2) !=0:
-#            	r = 300/math.sqrt(sum(I[i,j,:]**2))
-#            	if r < 1:
-#              	    I[i,j,:] *= r
-            if V[i,j]>15 and U[i,j]>-7:
-                M[i,j]=0
-    kernel = np.ones((5,5),np.uint8)   
-    M = cv2.morphologyEx(M, cv2.MORPH_OPEN, kernel)
-    M=cv2.GaussianBlur(M,(7,7),8)
-
-    # find Harris corners
-    dst = cv2.cornerHarris(M,5,3,0.04)
-    dst = cv2.dilate(dst,None)
-    ret, dst = cv2.threshold(dst,0.7*dst.max(),255,0)
-    dst = np.uint8(dst)
-
-    gray1 = cv2.cvtColor(I,cv2.COLOR_BGR2GRAY)
-    gray1 = np.float32(gray1)
-    dst1 = cv2.cornerHarris(gray1,3,3,0.04)
-    dst1 = cv2.dilate(dst1,None)
-    ret1, dst1 = cv2.threshold(dst1,0.01*dst1.max(),255,0)
-    dst1 = np.uint8(dst1)
-    E1 = np.where(dst1 > 0.01*dst1.max())
-
-    #fast = cv2.FastFeatureDetector(20, True)
-    #kp = fast.detect(I)
-    #L=np.zeros((1,2))
-    #for i in range(0, len(kp)):
-#	L=np.vstack((L,kp[i].pt))
-#    temp = L.view(np.ndarray)
-#    np.lexsort((temp[:, 1], ))
-#    temp[np.lexsort((temp[:, 1], ))]
-	
-    # identify the tip
-    E = np.where(dst > 0.01*dst.max())
-    rospy.logdebug('Shape of E: %s', np.shape(E))
-    rospy.logdebug('Shape of E1: %s', np.shape(E1))
-    if not E or not E1:
-        return 
-    D=[]
-    ind1 = np.lexsort((E1[1],E1[0]))
-    C1=[(E1[1][i],E1[0][i]) for i in ind1]
-    ind = np.lexsort((E[1],E[0]))
-    C=[(E[1][i],E[0][i]) for i in ind]
-    #C1=arrangeToList(E1)
-    #C=arrangeToList(E)
-    for i in range(1,np.shape(C1)[0]):
-        for j in range(1,np.shape(C)[0]):
-       	    if abs(C1[i][0]-C[j][0])<5 and abs(C1[i][1]-C[j][1])<5:
-		D.append([int(np.uint(C1[i][0]*2)), int(np.uint(C1[i][1]*2))])
-	#if np.shape(C)[0]>1:
-	#    D=[int(np.uint(C[1][0]*2)), int(np.uint(C[1][1]*2))]
-	#else:
-	#    D=[0,0]
-    if not D:
-	return [0,0]
-    else:
-        return count(D)#(int(np.uint(C1[1][0]*2)), int(np.uint(C1[1][1]*2)))
-        #return D[0]
-
 def reduce_size(A,tp,s):
     m = np.shape(A)[0]; n = np.shape(A)[1];
-    
-    # check type of image
-    if tp != 'gray' and tp != 'rgb':
-        error('This function only accepts two types of images: "gray" and "rgb"');
-    
-    # check value of s
-    if m % s != 0 or n % s != 0:
-        error('Image dimension is not divisible by s!')
-    
+      
     # reduce gray scale images by sxs
     if tp == 'gray' and s == 2:
         return (
@@ -218,14 +111,127 @@ def reduce_size(A,tp,s):
             + A[2::3, 1::3, :]/9 + A[0::3, 2::3, :]/9 + A[1::3, 2::3, :]/9 + A[2::3, 2::3, :]/9
         )
 
-def arrangeToList(A):
-    L=np.zeros((1,2))
-    if np.shape(A)[1]==1:
-	    L= np.vstack((L, [A[1],A[0]]))
-    elif np.shape(A)[1]>1:
-	    for i in range(0, np.shape(A)[1]):
-	        L=np.vstack((L,[A[1][i],A[0][i]]))
-    temp = L.view(np.ndarray)
-    np.lexsort((temp[:, 1], ))
-    temp[np.lexsort((temp[:, 1], ))]
-    return L
+# Return the coordinates detected the most often (for stability purposes) 
+def count(a):
+    results = []
+    count = []
+    final=[]
+    for x in a:
+        if x not in results and x!=(0,0):
+            results.append(x)
+            count.append(0)
+    for x in a:
+        for i in range(0,len(results)):
+            if x==results[i]:
+                count[i]+=1
+    for i in range(0,len(results)):
+        if count[i]==max(count):
+            final.append(results[i])	
+    return max(final)
+
+def TipDetector(I):
+    # Detect tips in an image
+
+    I.flags.writeable = True
+
+    # Find orange
+
+    Y=0.3*I[:,:,2]+0.6*I[:,:,1]+0.1*I[:,:,0]
+    V=0.4375*I[:,:,2]-0.375*I[:,:,1]-0.0625*I[:,:,0]
+    U=-0.15*I[:,:,2]-0.3*I[:,:,1]+0.45*I[:,:,0]
+
+    M=np.ones((np.shape(I)[0], np.shape(I)[1]), np.uint8)*255
+    for i in range(0,np.shape(I)[0]):
+        for j in range(0,np.shape(I)[1]):
+            if V[i,j]>15 and U[i,j]>-7:
+                M[i,j]=0
+    kernel = np.ones((5,5),np.uint8)   
+    M = cv2.morphologyEx(M, cv2.MORPH_OPEN, kernel)
+    M=cv2.GaussianBlur(M,(7,7),8)
+
+    # find Harris corners
+    dst = cv2.cornerHarris(M,5,3,0.04)
+    dst = cv2.dilate(dst,None)
+    ret, dst = cv2.threshold(dst,0.7*dst.max(),255,0)
+    dst = np.uint8(dst)
+
+    gray1 = cv2.cvtColor(I,cv2.COLOR_BGR2GRAY)
+    gray1 = np.float32(gray1)
+    dst1 = cv2.cornerHarris(gray1,3,3,0.04)
+    dst1 = cv2.dilate(dst1,None)
+    ret1, dst1 = cv2.threshold(dst1,0.01*dst1.max(),255,0)
+    dst1 = np.uint8(dst1)
+    E1 = np.where(dst1 > 0.01*dst1.max())
+	
+    # identify the tip
+    E = np.where(dst > 0.01*dst.max())
+    rospy.logdebug('Shape of E: %s', np.shape(E))
+    rospy.logdebug('Shape of E1: %s', np.shape(E1))
+    if not E or not E1:
+        return 
+    D=[]
+    ind1 = np.lexsort((E1[1],E1[0]))
+    C1=[(E1[1][i],E1[0][i]) for i in ind1]
+    ind = np.lexsort((E[1],E[0]))
+    C=[(E[1][i],E[0][i]) for i in ind]
+    for i in range(1,np.shape(C1)[0]):
+        for j in range(1,np.shape(C)[0]):
+       	    if abs(C1[i][0]-C[j][0])<5 and abs(C1[i][1]-C[j][1])<5:
+		D.append([int(np.uint(C1[i][0]*2)), int(np.uint(C1[i][1]*2))])
+    if not D:
+	return [0,0]
+    else:
+        return count(D)
+        
+def world_coordinates(u,v,left,right):
+    # Load the undistortion and rectification transformation map
+    path = '/home/ros/workspace/src/robotic_surgery/tip3d_detection/camera_calibration/calibration_data/'
+    left_undistortion = np.load(path + 'left_undistortion.npy', mmap_mode='r')
+    left_rectification = np.load(path + 'left_rectification.npy', mmap_mode='r')
+    right_undistortion = np.load(path + 'right_undistortion.npy', mmap_mode='r')
+    right_rectification = np.load(path + 'right_rectification.npy', mmap_mode='r')
+
+    # Rectify left and right images
+    left_rectified = cv2.remap(left, left_undistortion, left_rectification, 
+	                           cv2.INTER_NEAREST)
+    right_rectified = cv2.remap(right, right_undistortion, right_rectification, 
+	                    		cv2.INTER_NEAREST)
+
+    # Specify parameters for the semi global block matching algorithm
+    stereo = cv2.StereoSGBM(minDisparity=16, numDisparities=96, SADWindowSize=3, 
+	                		P1=216, P2=480, disp12MaxDiff=12, preFilterCap=100, 
+			                uniquenessRatio=10, speckleWindowSize=100, 
+			                speckleRange=2, fullDP=False)
+
+    # Compute the disparity map
+    disparity = stereo.compute(left_rectified, right_rectified)
+
+    # Adjust the disparity map for clarity in depth
+    disparity = disparity.astype(np.float32) / 16.0 
+
+    # Disparity-to-depth mapping matrix
+    Q = np.float32([[1, 0, 0, -0.5 * 640],
+                    [0, -1, 0, 0.5 * 480],
+                    [0, 0, 0, -0.8*640],
+                    [0, 0, 1, 0]])
+
+    # Compute the 3D world coordinates
+    Image = cv2.reprojectImageTo3D(disparity, Q)
+
+    # Identify the world coordinates of a certain point with left image
+    # coordinates (u,v)
+    camera_coord = Image[u,v]
+    
+    # Convert camera world coordinates to robot world coordinates
+    robot_coord = [0.,0.,0.]
+    distance_between_cameras = 9.1
+    vertical_distance_from_camera_to_the_board = 29.8
+    tilted_distance_from_camera_to_the_board = 31.3
+    centre_shift_to_right = 5.7
+    centre_shift_forward = 54.5
+    angle = math.acos(vertical_distance_from_camera_to_the_board/tilted_distance_from_camera_to_the_board)
+    robot_coord[0] = camera_coord[1]*math.cos(angle) - camera_coord[2]*math.sin(angle)
+    robot_coord[1] = camera_coord[0] + centre_shift_to_right
+    robot_coord[2] = -(camera_coord[1]*math.sin(angle) + camera_coord[2]*math.cos(angle))
+    
+    return robot_coord

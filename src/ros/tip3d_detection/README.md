@@ -1,110 +1,57 @@
-# Face detection nodes
+# 3D tip detection
 
-A simple set of nodes for performing face detection in video streams using
-OpenCV's Haar cascade classifier.
+This program detects a tip and returns its 3D world coordinates
 
-The most useful node is ``face_detect.py`` which will listen for incoming
-images and attempt to detect faces in them. It publishes detected faces on a
-ROS topic. There is a companion node, ``highlight_faces.py`` which can be used
-to draw boxes around faces.
+# Structure
 
-This set of nodes, along with [face_detection_msgs](../face_detection_msgs),
-serve as an example template which you can use you write your own Python-based
-nodes.
+tip3d_detection folder contains:
+(please ignore files that are not mentioned here, they might be used later on to assist
+in debugging or to make this program easier to use but they have not been fully implemented)
 
-Note that the face detection node is quite sophisticated; it supports
-configuration via ROS parameters and also decouples the input video sequences
-from the face detection algorithm. Since the face detection algorithm runs
-slower than 30Hz, this decoupling is needed to avoid ending up with high
-latency or a backlog of frames.
+1) camera_calibration folder
+    +) calibration_data: an empty folder where the calibration data will be created
+    +) calibration_pictures: 50 pairs of .ppm left & right images (taken by left
+    and right camera). There is a chessboard in all images but at different 
+    orientations. They will be used to calibrate the cameras
+    +) check_chessboard.py: read the 50 pairs of images, check if they are acceptable
+    and create .npy files containing chessboard coordinates
+    +) camera_calibration.py: calibrate the cameras and create .npy files containing
+    the undistortion and rectification transformation map
+    
+2) launch folder
+    +) launch file: launch 2 nodes to view input left and right cameras and a node
+    for tip localisation.
+    
+3) scripts
+    +) localise_tip: main file for 3D tip detection
+    
+4) src
+    +) tip3d_detection.py: contains functions with all the algorithms. The most important
+    ones are: TipDetector (use left camera to detect tip and return 2D image coordinates),
+    and world_coordinates (convert the 2D image coordinates to robot's 3D world coordinates)
+    
+# Usage
 
-## Usage
+STEP 1: From terminal, run the following:
 
-There is a demo launch file, ``face_detect_example.launch``, which will attempt
-to detect faces in real-time from an attached USB webcam. Launch it directly via:
+python check_chessboard.py
 
-```console
-$ roslaunch face_detection face_detect_example.launch
-```
+If it prints out "Everything is good" then proceed to STEP 2, otherwise follow the instructions
+in the print out messages
 
-or, if you are using our Docker-based workflow, via ``make gui_launch``:
+STEP 2: From terminal, run the following:
 
-```console
-$ make gui_launch PKG=face_detection LAUNCH=face_detect_example.launch
-```
+python camera_calibration.py
 
-When the bundled launch file is running, you may see the set of face detection
-results via:
+This should take some time (varies depending on the position and orientation of the cameras,
+roughly 2-5 min)
 
-```console
-$ rostopic echo /face_detect/faces
-```
+STEP 3: From terminal, run the following:
 
-## Nodes
+make gui_launch PKG="tip3d_detection" LAUNCH=tip3d_detect.launch
 
-### face_detect.py
+To view the published 3D coordinates, in a new ros terminal, type:
 
-Detect faces in input images via OpenCV.
+rostopic echo /localise_tip/tip
 
-#### Subscribed topics
-
-<dl>
-<dt>``camera/image_raw`` (sensor_msgs/Image)</dt>
-<dd>The image topic. Should be remapped to the name of the real image topic if
-necessary.</dd>
-</dl>
-
-#### Published topics
-
-<dl>
-<dt>*name*/``faces`` (face_detection_msgs/Faces)</dt>
-<dd>The detected faces in an image. The sequence number and stamp will match
-the ``Image`` message which was used. This fact may be used for
-synchronisation.</dd>
-</dl>
-
-#### Parameters
-
-<dl>
-<dt>``~haar_cascade_dir`` (``string``, default: "/usr/share/opencv/haarcascades/")</dt>
-<dd>Location of the directory on disk containing the pre-trained Haar
-classifiers shipped with OpenCV.</dd>
-</dl>
-
-### highlight_faces.py
-
-Synchronise input camera images and face detection results and draw a highlight
-around faces detected in the input image.
-
-#### Subscribed topics
-
-<dl>
-<dt>``camera/image_raw`` (sensor_msgs/Image)</dt>
-<dd>The image topic. Should be remapped to the name of the real image topic if
-necessary.</dd>
-<dt>``face_detect/faces`` (face_detection_msgs/Faces)</dt>
-<dd>The detected faces in an image. Assumes that timestamps are synchronised
-with the input images.</dd>
-</dl>
-
-#### Published topics
-
-<dl>
-<dt>*name*``/image_raw`` (sensor_msgs/Image)</dt>
-<dd>The output image topic. Contains the input image with detected faces
-highlighted.</dd>
-</dl>
-
-## Launch files
-
-### face_detect_example.launch
-
-An example of a real-time face detection pipeline. The attached USB webcam is
-used to capture video which is fed to ``face_detect.py``. The detected faces
-are then highlighted via ``highlight_faces.py``. Two ``image_view`` nodes are
-used to show the input and output video sequences.
-
-## Related packages
-
-[face_detection_msgs](../face_detection_msgs) - message types used by this library
-
+(if it runs error, run "rostopic list" to check the exact naming for the topic)
