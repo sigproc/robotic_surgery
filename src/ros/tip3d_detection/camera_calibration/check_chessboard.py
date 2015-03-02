@@ -20,6 +20,8 @@ n=50;
 left_image_points=[]
 right_image_points=[]
 
+a=0
+
 print "LEFT"
 for i in range(1,n):
 
@@ -38,6 +40,7 @@ for i in range(1,n):
 
     # print out the index of unacceptable files
     if not ret1:
+        a=1
         print i
         
 print "RIGHT"
@@ -58,7 +61,16 @@ for i in range(1,n):
 
     # print out the index of unacceptable files
     if not ret2:
+        a=1
         print i
+        
+if a==1:
+    print "The numbers listed above are indexes of faulty images"
+    print "Remove faulty pair of images (even if only 1 in the pair is faulty"
+    print "Make sure the indexes still start from 01 to 50"
+    print "Rerun this script"
+else:
+    print "Everything is good"
 
 # Save chessboard's corners' coordinates
 np.save('src/ros/tip3d_detection/camera_calibration/calibration_data/left_image_points', left_image_points)
