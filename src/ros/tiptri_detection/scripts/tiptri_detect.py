@@ -91,15 +91,14 @@ class TipDetectionNode(object):
 
         # Parse image message into numpy array
         image_array = image_to_array(image)
-        imageArray = reduce_size(image_array,'rgb',2);
+        #imageArray = reduce_size(image_array,'rgb',2);
 	#imageArray = reduce_size(imageArray,'rgb',2);
 	#imageArray = reduce_size(imageArray,'rgb',2);
         
         # Detect tips
-        #detect_tip = TipDetector
-        #tips = detect_tip(imageArray)
-	tips=(100,100)
-
+        detect_tip = TipDetector
+        tips = detect_tip(image_array)
+	
         # Create a tip bounding box for each tip
         #for tip_idx, tip_bbox in enumerate(tips):
         #    rospy.logdebug('Tip #%s at %s', tip_idx+1, tip_bbox)

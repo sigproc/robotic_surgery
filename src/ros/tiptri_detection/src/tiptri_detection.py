@@ -87,10 +87,11 @@ def array_to_image(array):
 
     return image_msg
 
+# This function returns the point that was detected the most
 def count(a):
     results = []
     count = []
-    final=[]
+    final = []
     for x in a:
         if x not in results and x!=(0,0):
             results.append(x)
@@ -100,90 +101,56 @@ def count(a):
             if x==results[i]:
                 count[i]+=1
     for i in range(0,len(results)):
-	count[i]=max(count)
-	final.append(results[i])
-    for i in range(0,len(results)):
         if count[i]==max(count):
-            final.append(results[i])	
-    return max(final)
+            final.append(results[i])
+    return results    
 
 def TipDetector(I):
-    # Detect tips in an image
+    # Detect tips of sharp triangles in an image
 
     I.flags.writeable = True
 
-    # reduce level of brightness & find orange
+    K=np.zeros((np.shape(I)[0],np.shape(I)[1],3),np.uint8)*255
+    gray = cv2.cvtColor(I, cv2.COLOR_BGR2GRAY)
+    canny=cv2.Canny(gray,50,100)
+    #gaussian_blur = cv2.GaussianBlur(gray,(7,7),0)
+    #canny_blur = cv2.Canny(gaussian_blur,50,110)
+    contours,hier = cv2.findContours(canny,1,2)
 
-    #n=0.95
-    Y=0.3*I[:,:,2]+0.6*I[:,:,1]+0.1*I[:,:,0]
-    V=0.4375*I[:,:,2]-0.375*I[:,:,1]-0.0625*I[:,:,0]
-    U=-0.15*I[:,:,2]-0.3*I[:,:,1]+0.45*I[:,:,0]
-    #I[:,:,2]=n*Y+1.6*V
-    #I[:,:,1]=n*Y-0.333*U-0.8*V
-    #I[:,:,0]=n*Y+2*U
+    n=3
 
-    M=np.ones((np.shape(I)[0], np.shape(I)[1]), np.uint8)*255
-    for i in range(0,np.shape(I)[0]):
-        for j in range(0,np.shape(I)[1]):
-#            if sum(I[i,j,:]**2) !=0:
-#            	r = 300/math.sqrt(sum(I[i,j,:]**2))
-#            	if r < 1:
-#              	    I[i,j,:] *= r
-            if V[i,j]>15 and U[i,j]>-7:
-                M[i,j]=0
-    kernel = np.ones((5,5),np.uint8)   
-    M = cv2.morphologyEx(M, cv2.MORPH_OPEN, kernel)
-    M=cv2.GaussianBlur(M,(7,7),8)
+    for cnt in contours:
+        approx = cv2.approxPolyDP(cnt,0.04*cv2.arcLength(cnt,True),True)
+        if len(approx)==n:
+            cv2.drawContours(K,[cnt],0,(0,255,0),1)
 
-    # find Harris corners
-    dst = cv2.cornerHarris(M,5,3,0.04)
-    dst = cv2.dilate(dst,None)
-    ret, dst = cv2.threshold(dst,0.7*dst.max(),255,0)
-    dst = np.uint8(dst)
+    gray1 = cv2.cvtColor(K, cv2.COLOR_BGR2GRAY)
+    canny1=cv2.Canny(gray1,50,100)
+    #gaussian_blur1 = cv2.GaussianBlur(gray1,(7,7),0)
+    #canny_blur1 = cv2.Canny(gaussian_blur1,50,110)
+    contours1,hier1 = cv2.findContours(canny1,1,2)
 
-    gray1 = cv2.cvtColor(I,cv2.COLOR_BGR2GRAY)
-    gray1 = np.float32(gray1)
-    dst1 = cv2.cornerHarris(gray1,3,3,0.04)
-    dst1 = cv2.dilate(dst1,None)
-    ret1, dst1 = cv2.threshold(dst1,0.01*dst1.max(),255,0)
-    dst1 = np.uint8(dst1)
-    E1 = np.where(dst1 > 0.01*dst1.max())
+    centre=[]
 
-    #fast = cv2.FastFeatureDetector(20, True)
-    #kp = fast.detect(I)
-    #L=np.zeros((1,2))
-    #for i in range(0, len(kp)):
-#	L=np.vstack((L,kp[i].pt))
-#    temp = L.view(np.ndarray)
-#    np.lexsort((temp[:, 1], ))
-#    temp[np.lexsort((temp[:, 1], ))]
-	
-    # identify the tip
-    E = np.where(dst > 0.01*dst.max())
-    rospy.logdebug('Shape of E: %s', np.shape(E))
-    rospy.logdebug('Shape of E1: %s', np.shape(E1))
-    if not E or not E1:
-        return 
-    D=[]
-    ind1 = np.lexsort((E1[1],E1[0]))
-    C1=[(E1[1][i],E1[0][i]) for i in ind1]
-    ind = np.lexsort((E[1],E[0]))
-    C=[(E[1][i],E[0][i]) for i in ind]
-    #C1=arrangeToList(E1)
-    #C=arrangeToList(E)
-    for i in range(1,np.shape(C1)[0]):
-        for j in range(1,np.shape(C)[0]):
-       	    if abs(C1[i][0]-C[j][0])<5 and abs(C1[i][1]-C[j][1])<5:
-		D.append([int(np.uint(C1[i][0]*2)), int(np.uint(C1[i][1]*2))])
-	#if np.shape(C)[0]>1:
-	#    D=[int(np.uint(C[1][0]*2)), int(np.uint(C[1][1]*2))]
-	#else:
-	#    D=[0,0]
-    if not D:
-	return [0,0]
+    for cnt1 in contours1:
+        approx1 = cv2.approxPolyDP(cnt1,0.04*cv2.arcLength(cnt1,True),True)
+        if len(approx1)==n:
+            a=(approx1[0][0][0],approx1[0][0][1])
+            b=(approx1[1][0][0],approx1[1][0][1])
+            c=(approx1[2][0][0],approx1[2][0][1])
+            ab=(a[0]-b[0])**2+(a[1]-b[1])**2
+            ac=(a[0]-c[0])**2+(a[1]-c[1])**2
+            bc=(c[0]-b[0])**2+(c[1]-b[1])**2
+            if min(ab,ac,bc)==ab and ab>50:
+                centre.append(c)
+            elif min(ab,ac,bc)==ac and ac>50:
+                centre.append(b)
+            elif min(ab,ac,bc)==bc and bc>50:
+                centre.append(a)
+    if not centre:
+	return (0,0)
     else:
-        return count(D)#(int(np.uint(C1[1][0]*2)), int(np.uint(C1[1][1]*2)))
-        #return D[0]
+        return count(centre)[0]
 
 def reduce_size(A,tp,s):
     m = np.shape(A)[0]; n = np.shape(A)[1];
