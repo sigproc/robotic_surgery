@@ -8,15 +8,16 @@ STATE={"left":None,"right":None}
 def handle_images():
     rospy.loginfo("Left: %s, Right: %s",STATE["left"].width, STATE["right"].width)
 
-def got_left_image(image_message):
-    STATE["left"]=image_message
-    if STATE["left"] is not None and STATE["right"] is not None:
-        handle_images()  
-    
-def got_right_image(image_message):
-    STATE["right"]=image_message
+def got_image(side, image_message):
+    STATE[side]=image_message
     if STATE["left"] is not None and STATE["right"] is not None:
         handle_images()
+        
+def got_left_image(image_message):
+    got_image('left', image_message)
+    
+def got_right_image(image_message):
+    got_image('right', image_message)
     
 def main():
     # Register the node with ROS
