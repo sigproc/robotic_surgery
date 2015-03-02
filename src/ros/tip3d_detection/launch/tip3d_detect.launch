@@ -37,15 +37,10 @@
     <param name="window_name" value="Right input video" />
   </node>
 
-  <!-- Launch the tip detector node proper -->
-  <node pkg="tip3d_detection" type="tip3d_detect.py" name="tip3d_detect" />
-
-  <!-- Launch a node to draw boxes around the tips -->
-  <node pkg="tip3d_detection" type="highlight_tips3d.py" name="tip3d_images" />
-
-  <!-- View output image -->
-  <node pkg="image_view" type="image_view" name="output_image">
-    <remap from="image" to="tip3d_images/image_raw" />
-    <param name="window_name" value="Detected tips3d (left)" />
+  <!-- Localise tip -->
+  <node pkg="tip3d_detection" type="localise_tip.py" name="localise_tip">
   </node>
+
+
+
 </launch>
