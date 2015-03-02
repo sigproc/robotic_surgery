@@ -18,16 +18,16 @@ def handle_images():
     # TODO: process STATE["left"] and STATE["right"] and get actual tip location
     # Detect tips in the image
     detect_tip = TipDetector
-    #tips2d = detect_tip(STATE["left"])
+    tips2d = detect_tip()
 
     # Convert to robot's world coordinates
     convert_world = world_coordinates
-    #tips3d = convert_world(tips2d[0],tips2d[1],STATE["left"],STATE["right"]):
+    tips3d = convert_world(tips2d[0],tips2d[1],STATE["left"],STATE["right"])
     
-    # Set position to fake values
-    tip_msg.x = STATE["left"].shape[0]
-    tip_msg.y = STATE["right"].shape[0]
-    tip_msg.z = np.random.random()
+    # Set positions to fake values
+    tip_msg.x = np.random.random() #tips3d[0]
+    tip_msg.y = np.random.random() #tips3d[1]
+    tip_msg.z = np.random.random() #tips3d[2]
 
     # Publish the tip message to the other nodes which are interested
     STATE["tip_publisher"].publish(tip_msg)

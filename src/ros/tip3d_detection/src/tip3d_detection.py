@@ -112,14 +112,15 @@ def reduce_size(A,tp,s):
         )
 
 def TipDetector():
-    pass
+    return (5,5)
 
 def world_coordinates(u,v,left,right):
     # Load the undistortion and rectification transformation map
-    left_undistortion = np.load('.ros/calibration_data/left_undistortion', mmap_mode='r')
-    left_rectification = np.load('.ros/calibration_data/left_rectification', mmap_mode='r')
-    right_undistortion = np.load('.ros/calibration_data/right_undistortion', mmap_mode='r')
-    right_rectification = np.load('.ros/calibration_data/right_rectification', mmap_mode='r')
+    path = '/home/ros/workspace/src/robotic_surgery/tip3d_detection/camera_calibration/calibration_data/'
+    left_undistortion = np.load(path + 'left_undistortion.npy', mmap_mode='r')
+    left_rectification = np.load(path + 'left_rectification.npy', mmap_mode='r')
+    right_undistortion = np.load(path + 'right_undistortion.npy', mmap_mode='r')
+    right_rectification = np.load(path + 'right_rectification.npy', mmap_mode='r')
 
     # Rectify left and right images
     left_rectified = cv2.remap(left, left_undistortion, left_rectification, 
