@@ -1,0 +1,51 @@
+<launch>
+  <!-- Launch the console so we can see node output -->
+  <node pkg="rqt_console" type="rqt_console" name="console" />
+
+  <!-- Attempting to use uvc_camera
+  <node pkg="uvc_camera" type="stereo_node" name="camera" >
+    <param name="left/device" value="/dev/video0" />
+    <param name="right/device" value="/dev/video1" />
+    <param name="fps" value="25" />
+  </node> -->
+
+  <!-- Launch the USB webcam node to provide camera images. -->
+  <node pkg="usb_cam" type="usb_cam_node" name="camera1" >
+    <param name="video_device" value="/dev/video0" />
+    <param name="contrast" value="128" />
+    <param name="saturation" value="128" />
+    <param name="autofocus" value="false" />
+    <param name="focus" value="0" />
+    <param name="framerate" value="25" />
+  </node>
+  <node pkg="usb_cam" type="usb_cam_node" name="camera2" >
+    <param name="video_device" value="/dev/video1" />
+    <param name="contrast" value="128" />
+    <param name="saturation" value="128" />
+    <param name="autofocus" value="false" />
+    <param name="focus" value="0" />
+    <param name="framerate" value="25" />
+  </node> 
+
+  <!-- View input camera image -->
+  <node pkg="image_view" type="image_view" name="input_image1">
+    <remap from="image" to="camera/left/image_raw" />
+    <param name="window_name" value="Left input video" />
+  </node>
+  <node pkg="image_view" type="image_view" name="input_image2">
+    <remap from="image" to="camera/right/image_raw" />
+    <param name="window_name" value="Right input video" />
+  </node>
+
+  <!-- Launch the tip detector node proper -->
+  <node pkg="tip3d_detection" type="tip3d_detect.py" name="tip3d_detect" />
+
+  <!-- Launch a node to draw boxes around the tips -->
+  <node pkg="tip3d_detection" type="highlight_tips3d.py" name="tip3d_images" />
+
+  <!-- View output image -->
+  <node pkg="image_view" type="image_view" name="output_image">
+    <remap from="image" to="tip3d_images/image_raw" />
+    <param name="window_name" value="Detected tips3d (left)" />
+  </node>
+</launch>
