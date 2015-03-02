@@ -111,9 +111,78 @@ def reduce_size(A,tp,s):
             + A[2::3, 1::3, :]/9 + A[0::3, 2::3, :]/9 + A[1::3, 2::3, :]/9 + A[2::3, 2::3, :]/9
         )
 
-def TipDetector():
-    return (5,5)
+# Return the coordinates detected the most often (for stability purposes) 
+def count(a):
+    results = []
+    count = []
+    final=[]
+    for x in a:
+        if x not in results and x!=(0,0):
+            results.append(x)
+            count.append(0)
+    for x in a:
+        for i in range(0,len(results)):
+            if x==results[i]:
+                count[i]+=1
+    for i in range(0,len(results)):
+        if count[i]==max(count):
+            final.append(results[i])	
+    return max(final)
 
+def TipDetector(I):
+    # Detect tips in an image
+
+    I.flags.writeable = True
+
+    # Find orange
+
+    Y=0.3*I[:,:,2]+0.6*I[:,:,1]+0.1*I[:,:,0]
+    V=0.4375*I[:,:,2]-0.375*I[:,:,1]-0.0625*I[:,:,0]
+    U=-0.15*I[:,:,2]-0.3*I[:,:,1]+0.45*I[:,:,0]
+
+    M=np.ones((np.shape(I)[0], np.shape(I)[1]), np.uint8)*255
+    for i in range(0,np.shape(I)[0]):
+        for j in range(0,np.shape(I)[1]):
+            if V[i,j]>15 and U[i,j]>-7:
+                M[i,j]=0
+    kernel = np.ones((5,5),np.uint8)   
+    M = cv2.morphologyEx(M, cv2.MORPH_OPEN, kernel)
+    M=cv2.GaussianBlur(M,(7,7),8)
+
+    # find Harris corners
+    dst = cv2.cornerHarris(M,5,3,0.04)
+    dst = cv2.dilate(dst,None)
+    ret, dst = cv2.threshold(dst,0.7*dst.max(),255,0)
+    dst = np.uint8(dst)
+
+    gray1 = cv2.cvtColor(I,cv2.COLOR_BGR2GRAY)
+    gray1 = np.float32(gray1)
+    dst1 = cv2.cornerHarris(gray1,3,3,0.04)
+    dst1 = cv2.dilate(dst1,None)
+    ret1, dst1 = cv2.threshold(dst1,0.01*dst1.max(),255,0)
+    dst1 = np.uint8(dst1)
+    E1 = np.where(dst1 > 0.01*dst1.max())
+	
+    # identify the tip
+    E = np.where(dst > 0.01*dst.max())
+    rospy.logdebug('Shape of E: %s', np.shape(E))
+    rospy.logdebug('Shape of E1: %s', np.shape(E1))
+    if not E or not E1:
+        return 
+    D=[]
+    ind1 = np.lexsort((E1[1],E1[0]))
+    C1=[(E1[1][i],E1[0][i]) for i in ind1]
+    ind = np.lexsort((E[1],E[0]))
+    C=[(E[1][i],E[0][i]) for i in ind]
+    for i in range(1,np.shape(C1)[0]):
+        for j in range(1,np.shape(C)[0]):
+       	    if abs(C1[i][0]-C[j][0])<5 and abs(C1[i][1]-C[j][1])<5:
+		D.append([int(np.uint(C1[i][0]*2)), int(np.uint(C1[i][1]*2))])
+    if not D:
+	return [0,0]
+    else:
+        return count(D)
+        
 def world_coordinates(u,v,left,right):
     # Load the undistortion and rectification transformation map
     path = '/home/ros/workspace/src/robotic_surgery/tip3d_detection/camera_calibration/calibration_data/'
