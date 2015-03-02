@@ -29,11 +29,11 @@
 
   <!-- View input camera image -->
   <node pkg="image_view" type="image_view" name="input_image1">
-    <remap from="image" to="camera/left/image_raw" />
+    <remap from="image" to="camera1/image_raw" />
     <param name="window_name" value="Left input video" />
   </node>
   <node pkg="image_view" type="image_view" name="input_image2">
-    <remap from="image" to="camera/right/image_raw" />
+    <remap from="image" to="camera2/image_raw" />
     <param name="window_name" value="Right input video" />
   </node>
 
