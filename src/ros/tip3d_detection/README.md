@@ -32,21 +32,25 @@ in debugging or to make this program easier to use but they have not been fully 
     
 # Usage
 
-STEP 1: From terminal, run the following:
+STEP 1: Check the paths for the cameras. Left camera is dev/video0, right is dev/video1.
+If the paths are different, either adjust the launch file accordingly or disable any built in
+cameras (eg. laptop's camera), plug the left camera before plugging the right one.
+
+STEP 2: From terminal, run the following:
 
 python check_chessboard.py
 
 If it prints out "Everything is good" then proceed to STEP 2, otherwise follow the instructions
 in the print out messages
 
-STEP 2: From terminal, run the following:
+STEP 3: From terminal, run the following:
 
 python camera_calibration.py
 
 This should take some time (varies depending on the position and orientation of the cameras,
 roughly 2-5 min)
 
-STEP 3: From terminal, run the following:
+STEP 4: From terminal, run the following:
 
 make gui_launch PKG="tip3d_detection" LAUNCH=tip3d_detect.launch
 
