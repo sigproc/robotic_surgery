@@ -170,8 +170,11 @@ def TipDetector(I):
                     centre.append(b)
                 elif min(ab,ac,bc)==bc and bc>50:
                     centre.append(a)
-                    
-    return count(centre)   
+    
+    if not centre:
+        return (0,0)
+    else:
+        return count(centre)   
         
 def world_coordinates(u,v,left,right):
     # Load the undistortion and rectification transformation map
@@ -221,8 +224,8 @@ def world_coordinates(u,v,left,right):
     centre_shift_to_right = 3.7
     centre_shift_forward = 73.8
     angle = math.acos(vertical_distance_from_camera_to_the_board/tilted_distance_from_camera_to_the_board)
-    robot_coord[0] = (camera_coord[1]*math.cos(angle) - camera_coord[2]*math.sin(angle) + centre_shift_forward)/100
-    robot_coord[1] = (camera_coord[0] + centre_shift_to_right)/100
-    robot_coord[2] = (-(camera_coord[1]*math.sin(angle) + camera_coord[2]*math.cos(angle)) + accurate_vertical_distance)/100
+    robot_coord[0] = (camera_coord[1]*math.sin(angle) - camera_coord[2]*math.cos(angle) + centre_shift_forward)/100
+    robot_coord[1] = (camera_coord[0] - centre_shift_to_right)/100
+    robot_coord[2] = (-(camera_coord[1]*math.cos(angle) + camera_coord[2]*math.sin(angle)) + accurate_vertical_distance)/100
     
     return robot_coord

@@ -39,7 +39,11 @@ def handle_images():
     # TODO: process STATE["left"] and STATE["right"] and get actual tip location
     # Detect tips in the image
     detect_tip = TipDetector
-    tips2d = detect_tip(STATE["left"])
+    left_image = STATE["left"]
+    #tips2d = detect_tip(left_image)
+    
+    # fake tips2d
+    tips2d=(351,328)
 
     # Convert to robot's world coordinates
     convert_world = world_coordinates
