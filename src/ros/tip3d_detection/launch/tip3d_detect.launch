@@ -2,13 +2,6 @@
   <!-- Launch the console so we can see node output -->
   <node pkg="rqt_console" type="rqt_console" name="console" />
 
-  <!-- Attempting to use uvc_camera
-  <node pkg="uvc_camera" type="stereo_node" name="camera" >
-    <param name="left/device" value="/dev/video0" />
-    <param name="right/device" value="/dev/video1" />
-    <param name="fps" value="25" />
-  </node> -->
-
   <!-- Launch the USB webcam node to provide camera images. -->
   <node pkg="usb_cam" type="usb_cam_node" name="camera1" >
     <param name="video_device" value="/dev/video0" />
