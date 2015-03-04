@@ -199,9 +199,9 @@ def world_coordinates(u,v,left,right):
 
     # Specify parameters for the semi global block matching algorithm
     stereo = cv2.StereoSGBM(minDisparity=16, numDisparities=96, SADWindowSize=3, 
-	                		P1=216, P2=480, disp12MaxDiff=12, preFilterCap=100, 
-			                uniquenessRatio=10, speckleWindowSize=100, 
-			                speckleRange=2, fullDP=False)
+	                		P1=216, P2=864, disp12MaxDiff=14, preFilterCap=100, 
+			                uniquenessRatio=15, speckleWindowSize=150, 
+			                speckleRange=1, fullDP=False)
 
     # Compute the disparity map
     disparity = stereo.compute(left_rectified, right_rectified)
@@ -225,13 +225,14 @@ def world_coordinates(u,v,left,right):
     # Convert camera world coordinates to robot world coordinates
     robot_coord = [0.,0.,0.]
     distance_between_cameras = 9.1
+    accurate_vertical_distance = 18
     vertical_distance_from_camera_to_the_board = 29.8
     tilted_distance_from_camera_to_the_board = 31.3
-    centre_shift_to_right = 5.7
-    centre_shift_forward = 54.5
+    centre_shift_to_right = 3.7
+    centre_shift_forward = 73.8
     angle = math.acos(vertical_distance_from_camera_to_the_board/tilted_distance_from_camera_to_the_board)
-    robot_coord[0] = camera_coord[1]*math.cos(angle) - camera_coord[2]*math.sin(angle)
-    robot_coord[1] = camera_coord[0] + centre_shift_to_right
-    robot_coord[2] = -(camera_coord[1]*math.sin(angle) + camera_coord[2]*math.cos(angle))
+    robot_coord[0] = (camera_coord[1]*math.cos(angle) - camera_coord[2]*math.sin(angle) + centre_shift_forward)/100
+    robot_coord[1] = (camera_coord[0] + centre_shift_to_right)/100
+    robot_coord[2] = (-(camera_coord[1]*math.sin(angle) + camera_coord[2]*math.cos(angle)) + accurate_vertical_distance)/100
     
     return robot_coord
