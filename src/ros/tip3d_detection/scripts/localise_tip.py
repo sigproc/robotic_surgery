@@ -45,10 +45,10 @@ def handle_images():
     convert_world = world_coordinates
     tips3d = convert_world(tips2d[0],tips2d[1],STATE["left"],STATE["right"])
     
-    # Set positions to fake values
-    tip_msg.x = np.random.random() #tips3d[0]
-    tip_msg.y = np.random.random() #tips3d[1]
-    tip_msg.z = np.random.random() #tips3d[2]
+    # Set positions to real values
+    tip_msg.x = tips3d[0] #np.random.random()
+    tip_msg.y = tips3d[1] #np.random.random()
+    tip_msg.z = tips3d[2] #np.random.random()
 
     # Publish the tip message to the other nodes which are interested
     STATE["tip_publisher"].publish(tip_msg)

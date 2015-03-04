@@ -134,54 +134,44 @@ def TipDetector(I):
 
     I.flags.writeable = True
 
-    # Find orange
+    K=np.zeros((np.shape(I)[0],np.shape(I)[1],3),np.uint8)*255
+    gray = cv2.cvtColor(I, cv2.COLOR_BGR2GRAY)
+    canny=cv2.Canny(gray,50,100)
+    contours,hier = cv2.findContours(canny,1,2)
 
-    Y=0.3*I[:,:,2]+0.6*I[:,:,1]+0.1*I[:,:,0]
-    V=0.4375*I[:,:,2]-0.375*I[:,:,1]-0.0625*I[:,:,0]
-    U=-0.15*I[:,:,2]-0.3*I[:,:,1]+0.45*I[:,:,0]
+    n=3
 
-    M=np.ones((np.shape(I)[0], np.shape(I)[1]), np.uint8)*255
-    for i in range(0,np.shape(I)[0]):
-        for j in range(0,np.shape(I)[1]):
-            if V[i,j]>15 and U[i,j]>-7:
-                M[i,j]=0
-    kernel = np.ones((5,5),np.uint8)   
-    M = cv2.morphologyEx(M, cv2.MORPH_OPEN, kernel)
-    M=cv2.GaussianBlur(M,(7,7),8)
+    for cnt in contours:
+        approx = cv2.approxPolyDP(cnt,0.04*cv2.arcLength(cnt,True),True)
+        if len(approx)==n:
+            cv2.drawContours(K,[cnt],0,(0,255,0),1)
 
-    # find Harris corners
-    dst = cv2.cornerHarris(M,5,3,0.04)
-    dst = cv2.dilate(dst,None)
-    ret, dst = cv2.threshold(dst,0.7*dst.max(),255,0)
-    dst = np.uint8(dst)
+    gray1 = cv2.cvtColor(K, cv2.COLOR_BGR2GRAY)
+    canny1=cv2.Canny(gray1,50,100)
+    gaussian_blur1 = cv2.GaussianBlur(gray1,(7,7),0)
+    canny_blur1 = cv2.Canny(gaussian_blur1,50,110)
+    contours1,hier1 = cv2.findContours(canny_blur1,1,2)
 
-    gray1 = cv2.cvtColor(I,cv2.COLOR_BGR2GRAY)
-    gray1 = np.float32(gray1)
-    dst1 = cv2.cornerHarris(gray1,3,3,0.04)
-    dst1 = cv2.dilate(dst1,None)
-    ret1, dst1 = cv2.threshold(dst1,0.01*dst1.max(),255,0)
-    dst1 = np.uint8(dst1)
-    E1 = np.where(dst1 > 0.01*dst1.max())
-	
-    # identify the tip
-    E = np.where(dst > 0.01*dst.max())
-    rospy.logdebug('Shape of E: %s', np.shape(E))
-    rospy.logdebug('Shape of E1: %s', np.shape(E1))
-    if not E or not E1:
-        return 
-    D=[]
-    ind1 = np.lexsort((E1[1],E1[0]))
-    C1=[(E1[1][i],E1[0][i]) for i in ind1]
-    ind = np.lexsort((E[1],E[0]))
-    C=[(E[1][i],E[0][i]) for i in ind]
-    for i in range(1,np.shape(C1)[0]):
-        for j in range(1,np.shape(C)[0]):
-       	    if abs(C1[i][0]-C[j][0])<5 and abs(C1[i][1]-C[j][1])<5:
-		D.append([int(np.uint(C1[i][0]*2)), int(np.uint(C1[i][1]*2))])
-    if not D:
-	return [0,0]
-    else:
-        return count(D)
+    centre=[]
+    
+    for cnt1 in contours1:
+        approx1 = cv2.approxPolyDP(cnt1,0.04*cv2.arcLength(cnt1,True),True)
+        if len(approx1)==n:
+            a=(approx1[0][0][0],approx1[0][0][1])
+            b=(approx1[1][0][0],approx1[1][0][1])
+            c=(approx1[2][0][0],approx1[2][0][1])
+            ab=(a[0]-b[0])**2+(a[1]-b[1])**2
+            ac=(a[0]-c[0])**2+(a[1]-c[1])**2
+            bc=(c[0]-b[0])**2+(c[1]-b[1])**2
+            if ((ab + ac - bc) / (2 *math.sqrt(ab*ac))) < 0.9 and ((bc + ac - ab) / (2 *math.sqrt(bc*ac))) < 0.9 and ((ab + bc - ac) / (2 *math.sqrt(ab*bc))) < 0.9:            
+                if min(ab,ac,bc)==ab and ab>50:
+                    centre.append(c)
+                elif min(ab,ac,bc)==ac and ac>50:
+                    centre.append(b)
+                elif min(ab,ac,bc)==bc and bc>50:
+                    centre.append(a)
+                    
+    return count(centre)   
         
 def world_coordinates(u,v,left,right):
     # Load the undistortion and rectification transformation map
