@@ -63,7 +63,7 @@ flags = (cv2.CALIB_FIX_ASPECT_RATIO + cv2.CALIB_ZERO_TANGENT_DIST +
 									cv2.CV_32FC1)
 
 # Save the undistortion and rectification transformation map
-np.save('src/ros/tip3d_detection/camera_calibration/calibration_data/left_undistortion', left_undistortion)
-np.save('src/ros/tip3d_detection/camera_calibration/calibration_data/left_rectification', left_rectification)
-np.save('src/ros/tip3d_detection/camera_calibration/calibration_data/right_undistortion', right_undistortion)
-np.save('src/ros/tip3d_detection/camera_calibration/calibration_data/right_rectification', right_rectification)
+np.save('src/ros/tip3d_detection/camera_calibration/calibration_data/left_undistortion.npy', left_undistortion)
+np.save('src/ros/tip3d_detection/camera_calibration/calibration_data/left_rectification.npy', left_rectification)
+np.save('src/ros/tip3d_detection/camera_calibration/calibration_data/right_undistortion.npy', right_undistortion)
+np.save('src/ros/tip3d_detection/camera_calibration/calibration_data/right_rectification.npy', right_rectification)

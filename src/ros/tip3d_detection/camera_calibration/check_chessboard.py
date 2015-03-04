@@ -73,5 +73,5 @@ else:
     print "Everything is good"
 
 # Save chessboard's corners' coordinates
-np.save('src/ros/tip3d_detection/camera_calibration/calibration_data/left_image_points', left_image_points)
-np.save('src/ros/tip3d_detection/camera_calibration/calibration_data/right_image_points', right_image_points)
+np.save('src/ros/tip3d_detection/camera_calibration/calibration_data/left_image_points.npy', left_image_points)
+np.save('src/ros/tip3d_detection/camera_calibration/calibration_data/right_image_points.npy', right_image_points)
