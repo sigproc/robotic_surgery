@@ -152,6 +152,12 @@ target_link_libraries(startIR ${catkin_LIBRARIES} ${JSONCPP_LIBRARIES})
 target_link_libraries(startRGB ${catkin_LIBRARIES} ${JSONCPP_LIBRARIES})
 target_link_libraries(startPointCloud ${catkin_LIBRARIES} ${JSONCPP_LIBRARIES} ${PCL_LIBRARIES})
 
+# A "meta"-target which depends on all of the C++ programs
+add_custom_target(k2_client_nodes)
+add_dependencies(k2_client_nodes
+    startAudio startBody startDepth startIR startRGB startPointCloud
+)
+
 #############
 ## Install ##
 #############
