@@ -6,5 +6,6 @@
 		<node name="startIR" pkg="k2_client" type="startIR"/>
 		<node name="startBody" pkg="k2_client" type="startBody"/>
 		<node name="startAudio" pkg="k2_client" type="startAudio"/>
+		<node name="startPointCloud" pkg="k2_client" type="startPointCloud" output="screen"/>
 		</group>
 </launch>
