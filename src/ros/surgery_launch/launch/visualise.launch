@@ -1,6 +1,6 @@
 <launch>
   <!-- robot arm model location -->
-  <arg name="model" value="$(find smart_arm_desc)/robot_desc.xacro" />	
+  <arg name="model" value="$(find smart_arm_desc)/smart_arm_static_desc.xacro" />	
 
   <!-- include the xacrodisplay launch file to load the robot into rviz. Set the gui
        argument to display a joint_state_publisher node.

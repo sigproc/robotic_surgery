@@ -12,14 +12,20 @@ find_package(catkin REQUIRED
 	COMPONENTS
 	message_generation std_msgs geometry_msgs
 	roscpp rospy cv_bridge camera_info_manager
-	image_transport
+	image_transport pcl_ros
 )
 
 ## System dependencies are found with CMake's conventions
-# find_package(Boost REQUIRED COMPONENTS system)
+#find_package(Boost REQUIRED COMPONENTS system)
 
 find_package(Jsoncpp REQUIRED)
 include_directories(${JSONCPP_INCLUDE_DIRS})
+
+# Find PCL dependencies
+find_package(PCL REQUIRED COMPONENTS common io)
+include_directories(${PCL_INCLUDE_DIRS})
+link_directories(${PCL_LIBRARY_DIRS})
+add_definitions(${PCL_DEFINITIONS})
 
 ## Uncomment this if the package has a setup.py. This macro ensures
 ## modules and global scripts declared therein get installed
@@ -120,6 +126,7 @@ add_executable(startBody src/k2_client/startBody.cpp)
 add_executable(startDepth src/k2_client/startDepth.cpp)
 add_executable(startIR src/k2_client/startIR.cpp)
 add_executable(startRGB src/k2_client/startRGB.cpp)
+add_executable(startPointCloud src/k2_client/startPointCloud.cpp)
 
 ## Declare a cpp executable
 # add_executable(k2_client_node src/k2_client_node.cpp)
@@ -132,6 +139,7 @@ add_dependencies(startBody k2_client_generate_messages_cpp)
 add_dependencies(startDepth k2_client_generate_messages_cpp)
 add_dependencies(startIR k2_client_generate_messages_cpp)
 add_dependencies(startRGB k2_client_generate_messages_cpp)
+add_dependencies(startPointCloud k2_client_generate_messages_cpp)
 
 ## Specify libraries to link a library or executable target against
 # target_link_libraries(k2_client_node
@@ -142,6 +150,13 @@ target_link_libraries(startBody ${catkin_LIBRARIES} ${JSONCPP_LIBRARIES})
 target_link_libraries(startDepth ${catkin_LIBRARIES} ${JSONCPP_LIBRARIES})
 target_link_libraries(startIR ${catkin_LIBRARIES} ${JSONCPP_LIBRARIES})
 target_link_libraries(startRGB ${catkin_LIBRARIES} ${JSONCPP_LIBRARIES})
+target_link_libraries(startPointCloud ${catkin_LIBRARIES} ${JSONCPP_LIBRARIES} ${PCL_LIBRARIES})
+
+# A "meta"-target which depends on all of the C++ programs
+add_custom_target(k2_client_nodes)
+add_dependencies(k2_client_nodes
+    startAudio startBody startDepth startIR startRGB startPointCloud
+)
 
 #############
 ## Install ##

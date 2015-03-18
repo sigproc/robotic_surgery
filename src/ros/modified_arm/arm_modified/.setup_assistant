@@ -1,0 +1,8 @@
+moveit_setup_assistant_config:
+  URDF:
+    package: smart_arm_desc
+    relative_path: smart_arm_static_desc.xacro
+  SRDF:
+    relative_path: config/smart_arm_static.srdf
+  CONFIG:
+    generated_timestamp: 1426180758
