@@ -1,0 +1,25 @@
+<launch>
+  <!-- Launch the console so we can see node output -->
+  <node pkg="rqt_console" type="rqt_console" name="console" />
+
+  <!-- Launch the USB webcam node to provide camera images. -->
+  <node pkg="usb_cam" type="usb_cam_node" name="camera1" >
+    <param name="video_device" value="/dev/video0" />
+    <param name="contrast" value="128" />
+    <param name="saturation" value="128" />
+    <param name="autofocus" value="false" />
+    <param name="focus" value="0" />
+    <param name="framerate" value="10" />
+  </node>
+
+  <!-- View input camera image -->
+  <node pkg="image_view" type="image_view" name="input_image">
+    <remap from="image" to="camera1/image_raw" />
+    <param name="window_name" value="Input video" />
+  </node>
+
+  <!-- Localise tip -->
+  <node pkg="tip2d_detection" type="localise_tip.py" name="localise_tip">
+    <remap from="image" to="camera1/image_raw" />
+  </node>
+</launch>
