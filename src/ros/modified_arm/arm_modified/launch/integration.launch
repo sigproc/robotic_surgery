@@ -1,0 +1,71 @@
+<launch>
+  <!-- Locate the xacro description of our smart arm robot and parse it-->
+  <arg name="model" value="$(find smart_arm_desc)/smart_arm_static_desc.xacro" />
+  <param name="robot_description" command="$(find xacro)/xacro.py $(arg model)" />
+  
+  <!-- Start the smart arm controller -->
+  <include file="$(find smart_arm_controller)/launch/smart_arm.launch" />
+  
+  <!-- Publish dynamixel joint states on the /joint_states topic -->
+  <rosparam param="joints">
+- "shoulder_pan_controller"
+- "shoulder_pitch_controller"
+- "elbow_flex_controller"
+- "wrist_roll_controller"
+- "claw_controller"
+  </rosparam>
+  <node name="joint_state_publisher" pkg="smart_arm_controller"
+    type="dynamixel_joint_state_publisher.py" output="screen" />
+
+  <!-- Use joint states to publish tf-s -->
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher" />
+
+  <!-- publish a static transform for /base_link relative to /world_link -->
+  <node pkg="tf" type="static_transform_publisher" name="base_link_broadcaster"
+    args="0 0 0 0 0 0 world_link base_link 100" />
+   
+  <include file="$(find arm_modified)/launch/planning_context.launch">
+    <arg name="load_robot_description" value="true"/>
+  </include>
+  
+  <!-- CAMERA -->
+  <!-- Launch the console so we can see node output -->
+  <node pkg="rqt_console" type="rqt_console" name="console" />
+
+  <!-- Launch the USB webcam node to provide camera images. -->
+  <node pkg="usb_cam" type="usb_cam_node" name="camera1" >
+    <param name="video_device" value="/dev/video1" />
+    <param name="contrast" value="128" />
+    <param name="saturation" value="128" />
+    <param name="autofocus" value="false" />
+    <param name="focus" value="0" />
+    <param name="framerate" value="1" />
+  </node>
+
+  <!-- View input camera image -->
+  <node pkg="image_view" type="image_view" name="input_image">
+    <remap from="image" to="camera1/image_raw" />
+    <param name="window_name" value="Input video" />
+  </node>
+
+  <!-- Localise tip -->
+  <node pkg="tip2d_detection" type="localise_tip.py" name="localise_tip">
+    <remap from="image" to="camera1/image_raw" />
+  </node>
+  
+  <!-- INVERSE KINEMATICS -->
+  <node name="IK"
+        pkg="arm_modified"
+        type="IK_modified_arm"
+        respawn="false" output="screen">
+    <rosparam command="load"
+              file="$(find arm_modified)/config/kinematics.yaml"/>
+  </node>
+
+  <!-- Publish desired position to IK -->
+  <node name="position_for_IK" pkg="arm_modified" type="pos_for_IK.py" />
+  
+  <!-- Make some movements -->
+  <node name="motion" pkg="smart_arm_controller" type="prop_closed_2nd_order_static.py" />
+  
+</launch>
