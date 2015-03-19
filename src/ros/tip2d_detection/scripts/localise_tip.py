@@ -22,6 +22,10 @@
 # THE SOFTWARE.
 #
 import rospy
+import roslib
+import sys
+import math
+import cv2
 from sensor_msgs.msg import Image
 from tip2d_detection_msgs.msg import Tip, Tips
 from tip2d_detection import image_to_array, TipDetector, world_coordinates
@@ -45,19 +49,24 @@ def handle_images():
     #tips = (320,240)
     
     # print coordinates
-    rospy.logdebug('Coordinates of tip: %s',
+    rospy.logerr('Coordinates of tip: %s',
             tips)
 
-    # Convert to robot's world coordinates
-    convert_world = world_coordinates
-    tips2d = convert_world(tips[0],tips[1])
-    
-    # Set positions to real values
-    tip_msg.x = tips2d[0] #np.random.random()
-    tip_msg.y = tips2d[1] #np.random.random()
-
-    # Publish the tip message to the other nodes which are interested
-    STATE["tip_publisher"].publish(tip_msg)
+    if tips[0] == 0 and tips[1] == 0:
+        rospy.logerr('Saving troublesome image')
+        cv2.imwrite('/home/ros/workspace/src/robotic_surgery/tip2d_detection/image.png',image)
+        #np.save('home/ros/workspace/src/robotic_surgery/tip2d_detection/image.png', image)
+    else:   
+        # Convert to robot's world coordinates
+        convert_world = world_coordinates
+        tips2d = convert_world(tips[0],tips[1])
+        
+        # Set positions to real values
+        tip_msg.x = tips2d[0] #np.random.random()
+        tip_msg.z = tips2d[1] #np.random.random()
+        
+        # Publish the tip message to the other nodes which are interested
+        STATE["tip_publisher"].publish(tip_msg)
 
 def got_image(image_message):
     STATE["last_image_header"]=image_message.header

@@ -137,9 +137,13 @@ def TipDetector(I):
     I = reduce_size(I,'rgb',2)
     
     # Convert RGB to YUV
-    Y=0.3*I[:,:,2]+0.6*I[:,:,1]+0.1*I[:,:,0]
-    V=0.4375*I[:,:,2]-0.375*I[:,:,1]-0.0625*I[:,:,0]
-    U=-0.15*I[:,:,2]-0.3*I[:,:,1]+0.45*I[:,:,0]
+    #Y=0.3*I[:,:,2]+0.6*I[:,:,1]+0.1*I[:,:,0]
+    #V=0.4375*I[:,:,2]-0.375*I[:,:,1]-0.0625*I[:,:,0]
+    #U=-0.15*I[:,:,2]-0.3*I[:,:,1]+0.45*I[:,:,0]
+    
+    Y=0.3*I[:,:,0]+0.6*I[:,:,1]+0.1*I[:,:,2]
+    V=0.4375*I[:,:,0]-0.375*I[:,:,1]-0.0625*I[:,:,2]
+    U=-0.15*I[:,:,0]-0.3*I[:,:,1]+0.45*I[:,:,2]
 
     # Find pink
     M=np.ones((np.shape(I)[0], np.shape(I)[1]), np.uint8)*255
@@ -163,7 +167,7 @@ def TipDetector(I):
     gray1 = np.float32(gray1)
     dst1 = cv2.cornerHarris(gray1,3,3,0.04)
     dst1 = cv2.dilate(dst1,None)
-    ret1, dst1 = cv2.threshold(dst1,0.01*dst1.max(),255,0)
+    ret1, dst1 = cv2.threshold(dst1,0.005*dst1.max(),255,0)
     dst1 = np.uint8(dst1)
     E1 = np.where(dst1 > 0.01*dst1.max())
 
@@ -190,19 +194,24 @@ def TipDetector(I):
                 
 def world_coordinates(u,v):
     # Load the camera matrix
-    path = '/home/ros/workspace/src/robotic_surgery/tip2d_detection/camera_calibration/calibration_data/'
-    camera_matrix = np.load(path + 'camera_matrix.npy', mmap_mode='r')
+    #path = '/home/ros/workspace/src/robotic_surgery/tip2d_detection/camera_calibration/calibration_data/'
+    #camera_matrix = np.load(path + 'camera_matrix.npy', mmap_mode='r')
     
-    coord=np.linalg.tensorsolve(camera_matrix, (u,v,1))
+    #coord=np.linalg.tensorsolve(camera_matrix, (u,v,1))
     
     # Identify the world coordinates of a certain point with left image
     # coordinates (u,v)
-    camera_coord = (coord[0], coord[1])
+    #camera_coord = (coord[0], coord[1])
     
     # Convert camera world coordinates to robot world coordinates
-    robot_coord = [0.,0.,0.]
+    #robot_coord = [0.,0.,0.]
     #robot_coord[0] = (camera_coord[1]*math.sin(angle) - camera_coord[2]*math.cos(angle) + centre_shift_forward)/100
     #robot_coord[1] = (camera_coord[0] - centre_shift_to_right)/100
     #robot_coord[2] = (-(camera_coord[1]*math.cos(angle) + camera_coord[2]*math.sin(angle)) + accurate_vertical_distance)/100
     
-    return camera_coord
+    coord_x = 0.39-0.085*u/160
+    coord_y = 0.2504-0.085*v/160
+    
+    world_2d_coord = (coord_x, coord_y)
+    
+    return world_2d_coord 
