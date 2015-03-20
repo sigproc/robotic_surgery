@@ -115,7 +115,7 @@ def get_wrist_roll(event):
 def get_claw(event):
     """Called when a new command is sent to the arm."""
     #Claw should always be closed
-    c_state.commanded_pose[3] = 1.90
+    c_state.commanded_pose[3] = 1.08
     c_state.commanded_pose_updated()
 
 

@@ -22,20 +22,25 @@ from copy import copy, deepcopy
 #    [0.325307, 0.0, 0.210856]
 #]
 
+#desired_positions = [
+#    [0.30, 0.0, 0.05],
+#    [0.30, 0.0, 0.15],
+#    [0.30, 0.0, 0.25],
+#    [0.32, 0.0, 0.15],
+#    [0.30, 0.0, 0.15],
+#    [0.28, 0.0, 0.15]
+#]
+
 desired_positions = [
     [0.30, 0.0, 0.05],
-    [0.30, 0.0, 0.15],
-    [0.30, 0.0, 0.25],
-    [0.32, 0.0, 0.15],
-    [0.30, 0.0, 0.15],
-    [0.28, 0.0, 0.15]
+    [0.30, 0.0, 0.25]
 ]
 
 if __name__ == '__main__':
-    pubs = rospy.Publisher('pos_for_IK', Float64MultiArray, queue_size=5)
-    rospy.init_node('position_for_IK', anonymous=True)
+    pubs = rospy.Publisher('desired_pos', Float64MultiArray, queue_size=5)
+    rospy.init_node('desired_position', anonymous=True)
     
-    rate = rospy.Rate(0.05) #once every 20 secs
+    rate = rospy.Rate(0.02) #once every 50 secs
     
     pos_idx = 0
     while not rospy.is_shutdown():

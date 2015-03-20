@@ -50,10 +50,6 @@
     <remap from="image" to="camera1/image_raw" />
   </node>
   
-  <!-- Load rviz -->
-  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find urdf_tutorial)/urdf.rviz"
-    required="true" />
-  
   <!-- INVERSE KINEMATICS -->
   <node name="IK"
         pkg="arm_modified"
@@ -63,8 +59,11 @@
               file="$(find arm_modified)/config/kinematics.yaml"/>
   </node>
 
-  <!-- Publish desired position to IK -->
-  <node name="position_for_IK" pkg="arm_modified" type="pos_for_IK.py" />
+  <!-- Publish desired position -->
+  <node name="desired_position" pkg="arm_modified" type="desired_pos.py" />
+  
+  <!-- Calculate difference between desired and camera derived position and send to IK -->
+  <node name="force_feedback" pkg="arm_modified" type="force_feedback.py" />
   
   <!-- Make some movements -->
   <node name="motion" pkg="smart_arm_controller" type="prop_closed_2nd_order_static.py" />
