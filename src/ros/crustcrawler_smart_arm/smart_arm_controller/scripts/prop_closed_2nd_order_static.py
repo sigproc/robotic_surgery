@@ -70,7 +70,7 @@ class PropControllerState:
             #rospy.logerr('p0: '+ str(p0))
             #rospy.logerr('p1: '+ str(p1))
             #rospy.logerr('p2: '+ str(p2))
-            rospy.logerr('Cmded pose: ' + str(self.commanded_pose))
+            #rospy.logerr('Cmded pose: ' + str(self.commanded_pose))
             #rospy.logerr('delta: ' +str(delta))
             #rospy.logerr('Controlling with prev poses: ' + str(self.prev_poses))
 
@@ -115,7 +115,7 @@ def get_wrist_roll(event):
 def get_claw(event):
     """Called when a new command is sent to the arm."""
     #Claw should always be closed
-    c_state.commanded_pose[3] = 1.9722
+    c_state.commanded_pose[3] = 1.90
     c_state.commanded_pose_updated()
 
 

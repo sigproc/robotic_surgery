@@ -53,7 +53,7 @@ def handle_images():
             tips)
 
     if tips[0] == 0 and tips[1] == 0:
-        rospy.logerr('Saving troublesome image')
+        #rospy.logerr('Saving troublesome image')
         cv2.imwrite('/home/ros/workspace/src/robotic_surgery/tip2d_detection/image.png',image)
         #np.save('home/ros/workspace/src/robotic_surgery/tip2d_detection/image.png', image)
     else:   
