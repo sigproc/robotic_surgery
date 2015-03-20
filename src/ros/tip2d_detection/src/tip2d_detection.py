@@ -212,7 +212,7 @@ def world_coordinates(u,v):
     #coord_x = 0.39-0.085*u/160
     #coord_y = 0.238-0.238*v/480
 
-    coord_x = (1.250.0002011*u**2 - 0.1269*u + 46.097)/100    
+    coord_x = (0.0002011*u**2 - 0.1269*u + 46.097)/100    
     coord_y = (-0.00005105*v**2 - 0.0343*v + 26.88)/100
     
     world_2d_coord = (coord_x, coord_y)
