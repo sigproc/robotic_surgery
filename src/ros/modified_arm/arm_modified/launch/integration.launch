@@ -29,9 +29,6 @@
   </include>
   
   <!-- CAMERA -->
-  <!-- Launch the console so we can see node output -->
-  <node pkg="rqt_console" type="rqt_console" name="console" />
-
   <!-- Launch the USB webcam node to provide camera images. -->
   <node pkg="usb_cam" type="usb_cam_node" name="camera1" >
     <param name="video_device" value="/dev/video1" />
@@ -52,6 +49,10 @@
   <node pkg="tip2d_detection" type="localise_tip.py" name="localise_tip">
     <remap from="image" to="camera1/image_raw" />
   </node>
+  
+  <!-- Load rviz -->
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find urdf_tutorial)/urdf.rviz"
+    required="true" />
   
   <!-- INVERSE KINEMATICS -->
   <node name="IK"
