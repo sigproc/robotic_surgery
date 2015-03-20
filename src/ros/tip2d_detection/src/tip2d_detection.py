@@ -209,8 +209,11 @@ def world_coordinates(u,v):
     #robot_coord[1] = (camera_coord[0] - centre_shift_to_right)/100
     #robot_coord[2] = (-(camera_coord[1]*math.cos(angle) + camera_coord[2]*math.sin(angle)) + accurate_vertical_distance)/100
     
-    coord_x = 0.39-0.085*u/160
-    coord_y = 0.238-0.238*v/480
+    #coord_x = 0.39-0.085*u/160
+    #coord_y = 0.238-0.238*v/480
+
+    coord_x = 1.25*u**2 - 93.5*u + 1856    
+    coord_y = -0.265*v**2 - 9.5*v + 454.125
     
     world_2d_coord = (coord_x, coord_y)
     
