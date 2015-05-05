@@ -40,7 +40,7 @@ if __name__ == '__main__':
     pubs = rospy.Publisher('desired_pos', Float64MultiArray, queue_size=5)
     rospy.init_node('desired_position', anonymous=True)
     
-    rate = rospy.Rate(0.02) #once every 50 secs
+    rate = rospy.Rate(0.02) #once every 50 secs 
     
     pos_idx = 0
     while not rospy.is_shutdown():
