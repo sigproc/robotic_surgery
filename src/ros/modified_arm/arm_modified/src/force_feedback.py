@@ -93,7 +93,8 @@ class ForceFeedbackState:
         
     def desired_pos_updated(self):
         # We transition to the force feedback state when we have pos
-        self.state = ForceFeedbackState.FORCEFB
+        #self.state = ForceFeedbackState.FORCEFB
+        self.state = ForceFeedbackState.NORMAL
 
 # A global variable holding the controller state
 f_state = ForceFeedbackState()
