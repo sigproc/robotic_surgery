@@ -85,12 +85,13 @@ class ForceFeedbackState:
             #if math.isnan(correction_mag)==True or correction_mag <= epsilon or correction_mag >= 0.05:
             #need correction_z_mag in case we are using force feedback on the wrong pose
             if math.isnan(correction_x_mag)==False and math.isnan(correction_z_mag)==False and correction_z_mag <= 0.15:
-                if correction_x_mag >= 0.06 or correction_z_mag >= 0.04:
+                if correction_x_mag >= 0.04 or correction_z_mag >= 0.03:
                     rospy.logerr('FORCE FEEDBACK with correction mag: ' + str(correction_mag))
                 
                     # Calculate new commanded pose
                     p0, p1 = self.prev_pos[:2]
                     correction_round = np.zeros(3)
+                    # rounding is necessary, otherwise the positions are too specific for IK to work
                     correction_round[0] = round(correction[0],2)
                     correction_round[2] = round(correction[2],2)
                     p0_new = p0 + correction_round
