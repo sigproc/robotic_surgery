@@ -49,8 +49,8 @@ joint_names = ('shoulder_pan_controller',
 joint_commands = [(-0.9, 1.972222, -1.972222, 0.0, 0.0),
                    (-0.9, 1.1, -1.25, 0.0, 0.0)]
 
-joint_commands = [(0.0, 0.0, -1.97222, 0.0, 1.9722),
-                   (0.0, 0.049386, -1.592159, 0.0, 1.9722)]
+joint_commands = [(0.0, 0.0, -1.97222, 0.0, 1.3),
+                   (0.0, 0.049386, -1.592159, 0.0, 0.5)]
 
 if __name__ == '__main__':
     pubs = [rospy.Publisher(name + '/command', Float64) for name in joint_names]

@@ -7,6 +7,8 @@
 #include <moveit/robot_model/robot_model.h>
 #include <moveit/robot_state/robot_state.h>
 #include <moveit/move_group_interface/move_group.h>
+#include <math.h>
+#include <cmath>
 
 void print_kinematic_state(robot_state::RobotStatePtr kinematic_state, const robot_state::JointModelGroup* joint_model_group) {
     // Get joint names
@@ -119,6 +121,41 @@ void gotPosition(const std_msgs::Float64MultiArray& msg)
             msg.data = ik_solution[i];
             joint_publishers[i].publish(msg);
         }
+    }
+    
+    // Otherwise, iterate 2 more times by rounding numbers and adding extra value and try to run IK again
+    // Other optimisation techniques can be used, 2 different methods are shown for demonstration purposes
+    else 
+    {   
+        //round the numbers to 1 decimal place
+        int x1 = floor(msg.data[0]*10+0.5);
+        int z1 = floor(msg.data[2]*10+0.5);
+        Eigen::Vector3d pos2(x1/10.0, msg.data[1], z1/10.0);
+        bool found_ik2 = calcIKSolutionForEffectorPos(pos2, ik_solution);
+    
+        if(found_ik2) {
+            for(int i=0; i<4; ++i) {
+                std_msgs::Float64 msg; 
+                msg.data = ik_solution[i];
+                joint_publishers[i].publish(msg);
+            }
+        }
+        
+        else {
+        
+            //add a random value (i.e. +0.1 to z dimension)
+            Eigen::Vector3d pos3(x1/10.0, msg.data[1], z1/10.0+0.1);
+            bool found_ik3 = calcIKSolutionForEffectorPos(pos3, ik_solution);
+    
+            if(found_ik3) {
+                for(int i=0; i<4; ++i) {
+                    std_msgs::Float64 msg; 
+                    msg.data = ik_solution[i];
+                    joint_publishers[i].publish(msg);
+                }
+            }
+        }
+        
     }
 }
 

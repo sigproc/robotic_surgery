@@ -29,7 +29,7 @@ link_directories(${catkin_LIBRARY_DIRS})
 add_executable(IK_testing src/kinematic_model_tutorial_tested.cpp)
 target_link_libraries(IK_testing ${catkin_LIBRARIES} ${Boost_LIBRARIES})
 
-add_executable(IK_modified_arm src/IK.cpp)
+add_executable(IK_modified_arm src/IK_modified_arm.cpp)
 target_link_libraries(IK_modified_arm ${catkin_LIBRARIES} ${Boost_LIBRARIES})
 
 install(TARGETS IK_testing DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
