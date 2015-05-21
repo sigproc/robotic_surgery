@@ -5,6 +5,7 @@
          indistinct. Explicitly set mid-range values. -->
     <param name="contrast" value="128" />
     <param name="saturation" value="128" />
+    <param name="video_device" value="/dev/video1" />
 
     <!-- The usb_cam node sets the focus value to something silly. Explicitly
          disable auto-focus and set focus to "0" (aka "at infinity"). -->
