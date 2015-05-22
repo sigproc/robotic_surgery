@@ -122,7 +122,8 @@ void gotPosition(const std_msgs::Float64MultiArray& msg)
             joint_publishers[i].publish(msg);
         }
     }
-    
+    /* //Tested this to improve IK success rate, but realised that there is in built IK iteration
+    // in ./config/kinematics
     // Otherwise, iterate 2 more times by rounding numbers and adding extra value and try to run IK again
     // Other optimisation techniques can be used, 2 different methods are shown for demonstration purposes
     else 
@@ -156,7 +157,7 @@ void gotPosition(const std_msgs::Float64MultiArray& msg)
             }
         }
         
-    }
+    }*/
 }
 
 int main(int argc, char **argv)

@@ -41,11 +41,10 @@ def handle_images():
     tip_msg.header = STATE["last_image_header"]
     
     # TODO: process STATE["image"] and get actual tip location
-    # Detect tips in the image
+    # Detect tips in the image 
     detect_tip = TipDetector
     image = STATE["image"]
     tips = detect_tip(image)
-    
     #tips = (320,240)
     
     # print coordinates
@@ -73,17 +72,18 @@ def got_image(image_message):
     STATE["image"]=image_to_array(image_message)
     if STATE["image"] is not None:
         handle_images()
+        
     
 def main():
     # Register the node with ROS
     rospy.init_node('localise_tip', anonymous=True)
-    
+
     # Subscribe to the image
     rospy.Subscriber("image", Image, got_image)
-    
+
     # Create a publisher for tip locations
     STATE["tip_publisher"] = rospy.Publisher(rospy.get_name() + '/tip', Tip, queue_size=1)
-    
+
     # spin() simply keeps python from exiting until this node is stopped
     rospy.spin()
 

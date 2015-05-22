@@ -39,5 +39,7 @@ kinematics_smart/arm_moveit_generated folder contains:
 #Other dependencies
 
 1. robotic_surgery/src/ros/crustcrawler_smart_arm/smart_arm_controller/scripts/prop_closed_2nd_order.py: Listens to the intermediate commands sent from IK.cpp, and publishes to the e.g. /shoulder_pitch_controller/state using a 2nd order controller if the tip of the robot arm has not reached the desired position. This is done at a significantly higher rate than 5 seconds (which is the time lapse between each camera input).
+
+2. robotic_surgery/src/ros/tip2d_detection and robotic_surgery/src/ros/tip2d_detection_msgs: Launches a camera node with tip detection capabilities. 
     
 --end--

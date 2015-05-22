@@ -163,6 +163,7 @@ def TipDetector(I):
     E = np.where(dst > 0.01*dst.max())
     
     # find Harris corners in image
+    ## remove this section and subsequent dependencies to only use Harris on pink space
     gray1 = cv2.cvtColor(I,cv2.COLOR_BGR2GRAY)
     gray1 = np.float32(gray1)
     dst1 = cv2.cornerHarris(gray1,3,3,0.04)
@@ -173,6 +174,7 @@ def TipDetector(I):
 
     # no tip identified  
     if not E or not E1:
+    #if not E:
         return [0,0]
     
     # Rearrange the coordinates in more readable format
@@ -182,15 +184,18 @@ def TipDetector(I):
     C=[(E[1][i],E[0][i]) for i in ind]
     
     # Identify the tip
+    # remove this if use Harris on pink space only
     D=[]
     for i in range(1,np.shape(C1)[0]):
         for j in range(1,np.shape(C)[0]):
        	    if abs(C1[i][0]-C[j][0])<5 and abs(C1[i][1]-C[j][1])<5:
                 D.append([int(np.uint(C1[i][0]*2)), int(np.uint(C1[i][1]*2))])
     if not D:
+    ##if not C:
         return [0,0]
     else:
         return count(D)
+        ##return count(C)
                 
 def world_coordinates(u,v):
     # Load the camera matrix
@@ -214,6 +219,10 @@ def world_coordinates(u,v):
 
     coord_x = (0.0002011*u**2 - 0.1269*u + 46.097)/100    
     coord_y = (-0.00005105*v**2 - 0.0343*v + 26.88)/100
+    
+    #coord_x = -0.001*v + 0.409   
+    #coord_y = (0.00002337*v**2 - 0.111097*v + 28.31192)/100
+    #coord_y = -0.001*v + 0.282
     
     world_2d_coord = (coord_x, coord_y)
     

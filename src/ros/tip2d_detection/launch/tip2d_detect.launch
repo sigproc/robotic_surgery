@@ -4,12 +4,12 @@
 
   <!-- Launch the USB webcam node to provide camera images. -->
   <node pkg="usb_cam" type="usb_cam_node" name="camera1" >
-    <param name="video_device" value="/dev/video0" />
+    <param name="video_device" value="/dev/video1" />
     <param name="contrast" value="128" />
     <param name="saturation" value="128" />
     <param name="autofocus" value="false" />
     <param name="focus" value="0" />
-    <param name="framerate" value="1" />
+    <param name="framerate" value="10" />
   </node>
 
   <!-- View input camera image -->
