@@ -89,12 +89,8 @@ class ForceFeedbackState:
                     rospy.logerr('FORCE FEEDBACK with correction mag: ' + str(correction_mag))
                 
                     # Calculate new commanded pose
-                    p0, p1 = self.prev_pos[:2]
-                    correction_round = np.zeros(3)
-                    # rounding is necessary, otherwise the positions are too specific for IK to work
-                    correction_round[0] = round(correction[0],2)
-                    correction_round[2] = round(correction[2],2)
-                    p0_new = p0 + correction_round
+                    p0 = self.stored_desired_pos
+                    p0_new = p0 + 1.0*correction #the constant can be changed depending on needs
                 
                     self.prev_pos = [p0_new] + self.prev_pos
                     self.prev_pos = self.prev_pos[:2]
@@ -103,6 +99,8 @@ class ForceFeedbackState:
                     p0_list = p0_new.tolist()
                     msg = Float64MultiArray()
                     msg.data = deepcopy(p0_list)
+                    
+                    rospy.logerr('Publishing msg: ' + str(msg))
                     self.pubs.publish(msg)     
                     
                 else:
@@ -141,6 +139,7 @@ class ForceFeedbackState:
         # We transition to the force feedback state when we have pos and at least 1 previous position
         if len(self.prev_pos) >= 1:
             self.state = ForceFeedbackState.FORCEFB
+            #self.state = ForceFeedbackState.NORMAL (use this line instead of the line above if you want to disable force FB)
     
     def desired_pos_normal(self):
         #Transition to normal state
@@ -174,10 +173,11 @@ if __name__ == '__main__':
     f_state.pubs = pubs
  
     #every 25 seconds (0.04) & (0.02) to make sure the robot has the correct camera derived position and use 50 secs for big loop
-    r = rospy.Rate(0.08) 
+    #0.16 is every 6.25 seconds
+    r = rospy.Rate(0.16) 
     while not rospy.is_shutdown():
         f_state.desired_pos_updated()
         f_state.tick()
         r.sleep()
         
-
+#
